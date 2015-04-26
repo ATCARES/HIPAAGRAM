@@ -90,13 +90,13 @@ Lastly, create a custom class named `messages` with the following schema. Be sur
 }
 ```
 
-Now we need to set the appropriate permissions for these three classes. To learn about setting permissions, check out [this guide](https://resources.catalyze.io/baas/guides/permissions-and-acls/#granting-full-permissions-on-a-custom-class). You can run cURL commands or use the REST client of your choice to run these commands. For the `conversations` class we need to assign the following permissions
+Now we need to set the appropriate permissions for these three classes. To learn about setting permissions, check out [this guide](https://resources.catalyze.io/baas/guides/permissions-and-acls/#granting-full-permissions-on-a-custom-class). You can run cURL commands or use the REST client of your choice to run these commands. For the `contacts` class we need to assign the following permissions
 
 ```
 ['create', 'retrieve']
 ```
 
-For the `contacts` class assign the following permissions
+For the `conversations` class assign the following permissions
 
 ```
 ['create']
