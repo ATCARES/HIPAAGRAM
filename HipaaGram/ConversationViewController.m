@@ -27,6 +27,8 @@
 @property (weak, nonatomic) IBOutlet UIButton *btnSend;
 @property (weak, nonatomic) IBOutlet UITextField *txtMessage;
 
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomTableConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *topTableConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomConstraint;
 
 @end
@@ -45,6 +47,11 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    if (self.navigationController.navigationBar.isTranslucent) {
+        _topTableConstraint.constant = 64.0;
+        _bottomTableConstraint.constant = -64.0;
+    }
+    
     _btnSend.layer.cornerRadius = 5;
     _btnSend.enabled = NO;
     
@@ -58,6 +65,7 @@
     _tblMessages.estimatedRowHeight = 97;
     _tblMessages.rowHeight = UITableViewAutomaticDimension;
     [_tblMessages registerNib:[UINib nibWithNibName:@"MessageTableViewCell" bundle:nil] forCellReuseIdentifier:@"MessageCellIdentifier"];
+    _tblMessages.transform = CGAffineTransformMakeRotation(-M_PI);
     
     [self queryMessages];
 }
@@ -165,7 +173,7 @@
             return [[[msg1 content] valueForKey:@"timestamp"] compare:[[msg2 content] valueForKey:@"timestamp"]];
         }];
         [_tblMessages reloadData];
-        [self scrollToBottomAnimated:YES];
+        //[self scrollToBottomAnimated:YES];
     } failure:^(NSDictionary *result, int status, NSError *error) {
         [[[UIAlertView alloc] initWithTitle:@"Error" message:@"Could not fetch previous messages" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
     }];
@@ -209,6 +217,7 @@
     Message *message = [_messages objectAtIndex:indexPath.row];
     BOOL sender = [[[message content] valueForKey:@"fromPhone"] isEqualToString:[[NSUserDefaults standardUserDefaults] valueForKey:kUserUsername]];
     [cell initializeWithMessage:message sender:sender];
+    cell.contentView.transform = CGAffineTransformMakeRotation(M_PI);
     return cell;
 }
 

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14D72i" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7702" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7701"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <objects>
@@ -18,7 +18,7 @@
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Feb 18, 2015, 4:39 PM" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9wN-IM-fxU">
                         <rect key="frame" x="8" y="0.0" width="304" height="21"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="21" id="fjE-cR-VXs"/>
+                            <constraint firstAttribute="height" constant="21" id="JI8-QU-u38"/>
                         </constraints>
                         <fontDescription key="fontDescription" type="system" pointSize="10"/>
                         <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
@@ -27,36 +27,42 @@
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sender Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ybn-xP-Z5T">
                         <rect key="frame" x="8" y="67" width="304" height="21"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="21" id="tAn-DN-zkK"/>
+                            <constraint firstAttribute="height" constant="21" id="UdQ-RU-ptH"/>
                         </constraints>
                         <fontDescription key="fontDescription" type="system" pointSize="10"/>
                         <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Z3N-qE-cLy">
+                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" bounces="NO" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="stF-zD-WUd">
                         <rect key="frame" x="8" y="29" width="304" height="30"/>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                    </view>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no"/>
+                        <dataDetectorType key="dataDetectorTypes" phoneNumber="YES" link="YES" address="YES" calendarEvent="YES"/>
+                    </textView>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="ybn-xP-Z5T" firstAttribute="bottom" secondItem="H2p-sc-9uM" secondAttribute="bottomMargin" id="7Xj-Z2-BmQ"/>
-                    <constraint firstItem="ybn-xP-Z5T" firstAttribute="trailing" secondItem="H2p-sc-9uM" secondAttribute="trailingMargin" id="8Ov-L7-1M5"/>
-                    <constraint firstItem="9wN-IM-fxU" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" constant="-8" id="9zs-6x-aNx"/>
-                    <constraint firstItem="Z3N-qE-cLy" firstAttribute="trailing" secondItem="9wN-IM-fxU" secondAttribute="trailing" id="UiM-PT-Yvx"/>
-                    <constraint firstItem="ybn-xP-Z5T" firstAttribute="top" secondItem="Z3N-qE-cLy" secondAttribute="bottom" constant="8" symbolic="YES" id="YpX-2x-Nf0"/>
-                    <constraint firstItem="Z3N-qE-cLy" firstAttribute="trailing" secondItem="ybn-xP-Z5T" secondAttribute="trailing" id="c2J-Pp-vcf"/>
-                    <constraint firstItem="Z3N-qE-cLy" firstAttribute="leading" secondItem="ybn-xP-Z5T" secondAttribute="leading" id="d25-ok-IUh"/>
-                    <constraint firstItem="9wN-IM-fxU" firstAttribute="leading" secondItem="Z3N-qE-cLy" secondAttribute="leading" id="fi3-Lj-v7F"/>
-                    <constraint firstItem="Z3N-qE-cLy" firstAttribute="top" secondItem="9wN-IM-fxU" secondAttribute="bottom" constant="8" symbolic="YES" id="flZ-ca-dcU"/>
-                    <constraint firstItem="ybn-xP-Z5T" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" id="pFd-XA-oKb"/>
+                    <constraint firstItem="9wN-IM-fxU" firstAttribute="trailing" secondItem="H2p-sc-9uM" secondAttribute="trailingMargin" id="1zD-RG-qne"/>
+                    <constraint firstItem="stF-zD-WUd" firstAttribute="top" secondItem="9wN-IM-fxU" secondAttribute="bottom" constant="8" id="692-ZP-Z9v"/>
+                    <constraint firstItem="9wN-IM-fxU" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" id="6cH-lY-0xm"/>
+                    <constraint firstItem="ybn-xP-Z5T" firstAttribute="top" secondItem="stF-zD-WUd" secondAttribute="bottom" constant="8" id="8jQ-DV-vgh"/>
+                    <constraint firstItem="ybn-xP-Z5T" firstAttribute="bottom" secondItem="H2p-sc-9uM" secondAttribute="bottomMargin" id="DP2-jO-gkh"/>
+                    <constraint firstItem="stF-zD-WUd" firstAttribute="trailing" secondItem="H2p-sc-9uM" secondAttribute="trailingMargin" id="Tc1-iN-zmU"/>
+                    <constraint firstItem="9wN-IM-fxU" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" constant="-8" id="g6J-xD-501"/>
+                    <constraint firstItem="ybn-xP-Z5T" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" id="lu1-bG-E3H"/>
+                    <constraint firstItem="stF-zD-WUd" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" id="tes-CE-tlc"/>
+                    <constraint firstItem="ybn-xP-Z5T" firstAttribute="trailing" secondItem="H2p-sc-9uM" secondAttribute="trailingMargin" id="vM8-G7-rqB"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
-                <outlet property="lblFrom" destination="ybn-xP-Z5T" id="sSl-HX-fx1"/>
-                <outlet property="lblTimestamp" destination="9wN-IM-fxU" id="d7H-Pd-p6l"/>
-                <outlet property="viewMessageHolder" destination="Z3N-qE-cLy" id="p1T-SW-NSw"/>
+                <outlet property="lblFrom" destination="ybn-xP-Z5T" id="uy7-No-Qo8"/>
+                <outlet property="lblTimestamp" destination="9wN-IM-fxU" id="SB3-eD-aIp"/>
+                <outlet property="leftConstraint" destination="tes-CE-tlc" id="6VY-2v-9Jb"/>
+                <outlet property="rightConstraint" destination="Tc1-iN-zmU" id="8wC-MV-Z8J"/>
+                <outlet property="txtMessage" destination="stF-zD-WUd" id="sfB-fZ-6PR"/>
             </connections>
-            <point key="canvasLocation" x="305" y="223"/>
+            <point key="canvasLocation" x="305" y="222.5"/>
         </tableViewCell>
     </objects>
 </document>
