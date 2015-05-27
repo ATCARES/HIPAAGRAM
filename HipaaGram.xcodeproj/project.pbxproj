@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2736C3C71A954EAF00BB9879 /* ConversationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2736C3C61A954EAF00BB9879 /* ConversationViewController.m */; };
+		2736C3C91A954EC500BB9879 /* ConversationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2736C3C81A954EC500BB9879 /* ConversationViewController.xib */; };
+		2736C3CF1A95AE7100BB9879 /* MessageTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 2736C3CD1A95AE7100BB9879 /* MessageTableViewCell.m */; };
+		2736C3D01A95AE7100BB9879 /* MessageTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2736C3CE1A95AE7100BB9879 /* MessageTableViewCell.xib */; };
 		2770966D190EA2C1006D2E6D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2770966C190EA2C1006D2E6D /* Foundation.framework */; };
 		2770966F190EA2C1006D2E6D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2770966E190EA2C1006D2E6D /* CoreGraphics.framework */; };
 		27709671190EA2C1006D2E6D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27709670190EA2C1006D2E6D /* UIKit.framework */; };
@@ -22,9 +26,6 @@
 		2770969F190EA2EF006D2E6D /* SignInViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2770969C190EA2EF006D2E6D /* SignInViewController.m */; };
 		277096A0190EA2EF006D2E6D /* SignInViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2770969D190EA2EF006D2E6D /* SignInViewController.xib */; };
 		277096A1190EA2EF006D2E6D /* SignInViewController~ipad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2770969E190EA2EF006D2E6D /* SignInViewController~ipad.xib */; };
-		277096A5190EA336006D2E6D /* ConversationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 277096A3190EA336006D2E6D /* ConversationViewController.m */; };
-		277096A6190EA336006D2E6D /* ConversationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 277096A4190EA336006D2E6D /* ConversationViewController.xib */; };
-		277096A8190EA352006D2E6D /* ConversationViewController~ipad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 277096A7190EA352006D2E6D /* ConversationViewController~ipad.xib */; };
 		277096AC190EA468006D2E6D /* ContactsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 277096AA190EA468006D2E6D /* ContactsViewController.m */; };
 		277096AD190EA468006D2E6D /* ContactsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 277096AB190EA468006D2E6D /* ContactsViewController.xib */; };
 		277096AF190EA482006D2E6D /* ContactsViewController~ipad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 277096AE190EA482006D2E6D /* ContactsViewController~ipad.xib */; };
@@ -110,6 +111,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2736C3C51A954EAF00BB9879 /* ConversationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConversationViewController.h; sourceTree = "<group>"; };
+		2736C3C61A954EAF00BB9879 /* ConversationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConversationViewController.m; sourceTree = "<group>"; };
+		2736C3C81A954EC500BB9879 /* ConversationViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ConversationViewController.xib; sourceTree = "<group>"; };
+		2736C3CC1A95AE7100BB9879 /* MessageTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageTableViewCell.h; sourceTree = "<group>"; };
+		2736C3CD1A95AE7100BB9879 /* MessageTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageTableViewCell.m; sourceTree = "<group>"; };
+		2736C3CE1A95AE7100BB9879 /* MessageTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MessageTableViewCell.xib; sourceTree = "<group>"; };
 		27709669190EA2C1006D2E6D /* HipaaGram.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HipaaGram.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2770966C190EA2C1006D2E6D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		2770966E190EA2C1006D2E6D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -130,10 +137,6 @@
 		2770969C190EA2EF006D2E6D /* SignInViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignInViewController.m; sourceTree = "<group>"; };
 		2770969D190EA2EF006D2E6D /* SignInViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SignInViewController.xib; sourceTree = "<group>"; };
 		2770969E190EA2EF006D2E6D /* SignInViewController~ipad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = "SignInViewController~ipad.xib"; sourceTree = "<group>"; };
-		277096A2190EA336006D2E6D /* ConversationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConversationViewController.h; sourceTree = "<group>"; };
-		277096A3190EA336006D2E6D /* ConversationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConversationViewController.m; sourceTree = "<group>"; };
-		277096A4190EA336006D2E6D /* ConversationViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ConversationViewController.xib; sourceTree = "<group>"; };
-		277096A7190EA352006D2E6D /* ConversationViewController~ipad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = "ConversationViewController~ipad.xib"; sourceTree = "<group>"; };
 		277096A9190EA468006D2E6D /* ContactsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContactsViewController.h; sourceTree = "<group>"; };
 		277096AA190EA468006D2E6D /* ContactsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContactsViewController.m; sourceTree = "<group>"; };
 		277096AB190EA468006D2E6D /* ContactsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ContactsViewController.xib; sourceTree = "<group>"; };
@@ -424,10 +427,9 @@
 				277096B1190EA4C5006D2E6D /* ConversationListViewController.m */,
 				277096B2190EA4C5006D2E6D /* ConversationListViewController.xib */,
 				277096B5190EA4D8006D2E6D /* ConversationListViewController~ipad.xib */,
-				277096A2190EA336006D2E6D /* ConversationViewController.h */,
-				277096A3190EA336006D2E6D /* ConversationViewController.m */,
-				277096A4190EA336006D2E6D /* ConversationViewController.xib */,
-				277096A7190EA352006D2E6D /* ConversationViewController~ipad.xib */,
+				2736C3C51A954EAF00BB9879 /* ConversationViewController.h */,
+				2736C3C61A954EAF00BB9879 /* ConversationViewController.m */,
+				2736C3C81A954EC500BB9879 /* ConversationViewController.xib */,
 				277096A9190EA468006D2E6D /* ContactsViewController.h */,
 				277096AA190EA468006D2E6D /* ContactsViewController.m */,
 				277096AB190EA468006D2E6D /* ContactsViewController.xib */,
@@ -474,6 +476,9 @@
 				277096C2190EA7F5006D2E6D /* ContactTableViewCell.h */,
 				277096C3190EA7F5006D2E6D /* ContactTableViewCell.m */,
 				277096C4190EA7F5006D2E6D /* ContactTableViewCell.xib */,
+				2736C3CC1A95AE7100BB9879 /* MessageTableViewCell.h */,
+				2736C3CD1A95AE7100BB9879 /* MessageTableViewCell.m */,
+				2736C3CE1A95AE7100BB9879 /* MessageTableViewCell.xib */,
 			);
 			name = UITableViewCells;
 			path = HipaaGram/UITableViewCells;
@@ -861,6 +866,7 @@
 				ORGANIZATIONNAME = "Catalyze Inc.";
 				TargetAttributes = {
 					27709668190EA2C1006D2E6D = {
+						DevelopmentTeam = 8SQK7H5L22;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -900,13 +906,13 @@
 				278B8F8719106C4D00CF5ED0 /* UAInboxLocalization.bundle in Resources */,
 				277096AD190EA468006D2E6D /* ContactsViewController.xib in Resources */,
 				278B8FAB19106C4D00CF5ED0 /* AirshipConfig.plist in Resources */,
+				2736C3C91A954EC500BB9879 /* ConversationViewController.xib in Resources */,
 				278B8F8919106C4D00CF5ED0 /* UAInboxMessageListController.xib in Resources */,
 				278B8F9F19106C4D00CF5ED0 /* UALocationSettingsViewController.xib in Resources */,
 				278B8FA519106C4D00CF5ED0 /* UAPushSettingsChannelInfoViewController.xib in Resources */,
 				278B8F9A19106C4D00CF5ED0 /* bottom-detail@2x.png in Resources */,
 				278B8F9919106C4D00CF5ED0 /* bottom-detail.png in Resources */,
 				278B8F8619106C4D00CF5ED0 /* list-image-placeholder@2x.png in Resources */,
-				277096A6190EA336006D2E6D /* ConversationViewController.xib in Resources */,
 				277096AF190EA482006D2E6D /* ContactsViewController~ipad.xib in Resources */,
 				278B8FA119106C4D00CF5ED0 /* UAPushLocalization.bundle in Resources */,
 				278B8FA419106C4D00CF5ED0 /* UAPushSettingsAliasView.xib in Resources */,
@@ -917,12 +923,12 @@
 				27709677190EA2C1006D2E6D /* InfoPlist.strings in Resources */,
 				278B8FA919106C4D00CF5ED0 /* UAPushSettingsUserInfoView.xib in Resources */,
 				277096B4190EA4C5006D2E6D /* ConversationListViewController.xib in Resources */,
-				277096A8190EA352006D2E6D /* ConversationViewController~ipad.xib in Resources */,
 				278B8F8A19106C4D00CF5ED0 /* UAInboxMessageViewController.xib in Resources */,
 				278B8FA819106C4D00CF5ED0 /* UAPushSettingsTokenView.xib in Resources */,
 				277096B6190EA4D8006D2E6D /* ConversationListViewController~ipad.xib in Resources */,
 				278B8F9B19106C4D00CF5ED0 /* middle-detail.png in Resources */,
 				278B8FAA19106C4D00CF5ED0 /* UAPushSettingsView.xib in Resources */,
+				2736C3D01A95AE7100BB9879 /* MessageTableViewCell.xib in Resources */,
 				277096A1190EA2EF006D2E6D /* SignInViewController~ipad.xib in Resources */,
 				278B8F9C19106C4D00CF5ED0 /* middle-detail@2x.png in Resources */,
 				278B8F9D19106C4D00CF5ED0 /* top-detail.png in Resources */,
@@ -1010,11 +1016,12 @@
 				277096D3190EAE96006D2E6D /* Conversation.m in Sources */,
 				278B8F9119106C4D00CF5ED0 /* UAPushSettingsAliasViewController.m in Sources */,
 				27709733190EB1FD006D2E6D /* Message.m in Sources */,
+				2736C3CF1A95AE7100BB9879 /* MessageTableViewCell.m in Sources */,
 				2770967D190EA2C1006D2E6D /* AppDelegate.m in Sources */,
-				277096A5190EA336006D2E6D /* ConversationViewController.m in Sources */,
 				278B8F8219106C4D00CF5ED0 /* UAInboxMessageViewController.m in Sources */,
 				278B8F9319106C4D00CF5ED0 /* UAPushSettingsSoundsViewController.m in Sources */,
 				277096C0190EA743006D2E6D /* ConversationListTableViewCell.m in Sources */,
+				2736C3C71A954EAF00BB9879 /* ConversationViewController.m in Sources */,
 				278B8F7F19106C4D00CF5ED0 /* UAInboxAlertHandler.m in Sources */,
 				277096AC190EA468006D2E6D /* ContactsViewController.m in Sources */,
 				278B8F8319106C4D00CF5ED0 /* UAInboxNavUI.m in Sources */,
@@ -1150,9 +1157,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "HipaaGram/HipaaGram-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
-					"\"${PODS_ROOT}/Headers\"",
-					"\"${PODS_ROOT}/Headers/JSMessagesViewController\"",
-					"\"${PODS_ROOT}/Headers/JSQSystemSoundPlayer\"",
+					"$(inherited)",
 					"\"../Airship/**\"",
 				);
 				INFOPLIST_FILE = "HipaaGram/HipaaGram-Info.plist";
@@ -1177,9 +1182,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "HipaaGram/HipaaGram-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
-					"\"${PODS_ROOT}/Headers\"",
-					"\"${PODS_ROOT}/Headers/JSMessagesViewController\"",
-					"\"${PODS_ROOT}/Headers/JSQSystemSoundPlayer\"",
+					"$(inherited)",
 					"\"../Airship/**\"",
 				);
 				INFOPLIST_FILE = "HipaaGram/HipaaGram-Info.plist";

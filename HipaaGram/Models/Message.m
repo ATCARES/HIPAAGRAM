@@ -22,26 +22,24 @@
     self = [super initWithClassName:className];
     if (self) {
         for (NSString *s in [dictionary allKeys]) {
-            [self setObject:[dictionary objectForKey:s] forKey:s];
+            [[self content] setValue:[dictionary objectForKey:s] forKey:s];
         }
     }
     return self;
 }
 
 - (NSString *)text {
-    return [self valueForKey:@"msgContent"];
+    return [[self content] valueForKey:@"msgContent"];
 }
 
 - (NSString *)sender {
-    return [self valueForKey:@"fromPhone"];
+    return [[self content] valueForKey:@"fromPhone"];
 }
 
 - (NSDate *)date {
     NSDateFormatter *format = [[NSDateFormatter alloc] init];
     [format setDateFormat:@"MM-dd-yyyy HH:mm:ss.SSSSSS"];
-    NSLog(@"timestamp %@", [self valueForKey:@"timestamp"]);
-    NSLog(@"returning %@", [format dateFromString:[self valueForKey:@"timestamp"]]);
-    return [format dateFromString:[self valueForKey:@"timestamp"]];
+    return [format dateFromString:[[self content] valueForKey:@"timestamp"]];
 }
 
 @end

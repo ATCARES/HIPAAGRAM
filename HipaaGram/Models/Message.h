@@ -15,11 +15,13 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "JSMessageData.h"
 #import "Catalyze.h"
 
-@interface Message : CatalyzeObject<JSMessageData>
+@interface Message : CatalyzeEntry
 
 - (id)initWithClassName:(NSString *)className dictionary:(NSDictionary *)dictionary;
+- (NSString *)text;
+- (NSString *)sender;
+- (NSDate *)date;
 
 @end

@@ -83,18 +83,16 @@
     if (_btnRegister.alpha == 1.0f) {
         [self disableRegistration];
     } else if ([[NSUserDefaults standardUserDefaults] valueForKey:kUserUsername]) {
-        [CatalyzeUser logInWithUsernameInBackground:[[NSUserDefaults standardUserDefaults] valueForKey:kUserUsername] password:_txtPassword.text block:^(int status, NSString *response, NSError *error) {
+        [CatalyzeUser logInWithUsernameInBackground:[[NSUserDefaults standardUserDefaults] valueForKey:kUserUsername] password:_txtPassword.text success:^(CatalyzeUser *result) {
+            if (![[NSUserDefaults standardUserDefaults] boolForKey:@"added_to_contacts"]) {
+                [self addToContacts:[[CatalyzeUser currentUser] username] usersId:[[CatalyzeUser currentUser] usersId]];
+            }
+            [_delegate signInSuccessful];
+        } failure:^(NSDictionary *result, int status, NSError *error) {
             if (status == 404) {
                 [self enableRegistration];
             } else {
-                if (error) {
-                    [[[UIAlertView alloc] initWithTitle:@"Error" message:@"Invalid username / password" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
-                } else {
-                    if (![[NSUserDefaults standardUserDefaults] boolForKey:@"added_to_contacts"]) {
-                        [self addToContacts:[[CatalyzeUser currentUser] username] usersId:[[CatalyzeUser currentUser] usersId]];
-                    }
-                    [_delegate signInSuccessful];
-                }
+                [[[UIAlertView alloc] initWithTitle:@"Error" message:@"Invalid username / password" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
             }
         }];
     } else {
@@ -110,33 +108,28 @@
     Email *email = [[Email alloc] init];
     email.primary = [self randomEmail];
     
-    [CatalyzeUser signUpWithUsernameInBackground:_txtPhoneNumber.text email:email name:[[Name alloc] init] password:_txtPassword.text block:^(int status, NSString *response, NSError *error) {
-        if (error) {
-            [[[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Could not sign up: %@", error.localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
-        } else {
-            NSDictionary *body = [NSJSONSerialization JSONObjectWithData:[response dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
-            [[NSUserDefaults standardUserDefaults] setValue:[body valueForKey:@"usersId"] forKey:@"usersId"];
-            [[NSUserDefaults standardUserDefaults] setValue:email.primary forKey:kUserEmail];
-            [[NSUserDefaults standardUserDefaults] setValue:_txtPhoneNumber.text forKey:kUserUsername];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-            
-            [[[UIAlertView alloc] initWithTitle:@"Success" message:@"Please activate your account and then sign in" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
-            [self disableRegistration];
-        }
+    [CatalyzeUser signUpWithUsernameInBackground:_txtPhoneNumber.text email:email name:[[Name alloc] init] password:_txtPassword.text success:^(CatalyzeUser *result) {
+        [[NSUserDefaults standardUserDefaults] setValue:[result usersId] forKey:@"usersId"];
+        [[NSUserDefaults standardUserDefaults] setValue:email.primary forKey:kUserEmail];
+        [[NSUserDefaults standardUserDefaults] setValue:_txtPhoneNumber.text forKey:kUserUsername];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        [[[UIAlertView alloc] initWithTitle:@"Success" message:@"Please activate your account and then sign in" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
+        [self disableRegistration];
+    } failure:^(NSDictionary *result, int status, NSError *error) {
+        [[[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Could not sign up: %@", error.localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
     }];
 }
 
 - (void)addToContacts:(NSString *)username usersId:(NSString *)usersId {
-    CatalyzeObject *contact = [CatalyzeObject objectWithClassName:@"contacts"];
-    [contact setValue:username forKey:@"user_username"];
-    [contact setValue:usersId forKey:@"user_usersId"];
-    [contact createInBackgroundWithBlock:^(BOOL succeeded, int status, NSError *error) {
-        if (!succeeded) {
-            NSLog(@"Was not added to the contacts custom class!");
-        } else {
-            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"added_to_contacts"];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-        }
+    CatalyzeEntry *contact = [CatalyzeEntry entryWithClassName:@"contacts"];
+    [[contact content] setValue:username forKey:@"user_username"];
+    [[contact content] setValue:usersId forKey:@"user_usersId"];
+    [contact createInBackgroundWithSuccess:^(id result) {
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"added_to_contacts"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    } failure:^(NSDictionary *result, int status, NSError *error) {
+        NSLog(@"Was not added to the contacts custom class!");
     }];
 }
 

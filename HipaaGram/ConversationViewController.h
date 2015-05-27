@@ -16,7 +16,6 @@
 
 #import <UIKit/UIKit.h>
 #import "HipaaGramViewController.h"
-#import "JSMessagesViewController.h"
 
 @protocol PushNotificationHandler <NSObject>
 
@@ -24,7 +23,7 @@
 
 @end
 
-@interface ConversationViewController : JSMessagesViewController<JSMessagesViewDataSource, JSMessagesViewDelegate, UITableViewDataSource, UITableViewDelegate, PushNotificationHandler>
+@interface ConversationViewController : UIViewController<UITableViewDataSource, UITableViewDelegate, PushNotificationHandler, UITextFieldDelegate>
 @property (strong, nonatomic) NSString *userId;
 @property (strong, nonatomic) NSString *username;
 @property (strong, nonatomic) NSString *conversationsId;

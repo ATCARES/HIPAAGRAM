@@ -68,39 +68,35 @@
     CatalyzeQuery *query = [CatalyzeQuery queryWithClassName:@"conversations"];
     [query setPageNumber:1];
     [query setPageSize:20];
-    [query retrieveInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
-        if (error) {
-            [[[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Could not fetch the list of conversations: %@", error.localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
-        } else {
-            [_conversations addObjectsFromArray:objects];
-            [[NSUserDefaults standardUserDefaults] setObject:_conversations forKey:kConversations];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-            [_tblConversationList reloadData];
-        }
+    [query retrieveInBackgroundWithSuccess:^(NSArray *result) {
+        [_conversations addObjectsFromArray:result];
+        //[[NSUserDefaults standardUserDefaults] setObject:_conversations forKey:kConversations];
+        //[[NSUserDefaults standardUserDefaults] synchronize];
+        [_tblConversationList reloadData];
+    } failure:^(NSDictionary *result, int status, NSError *error) {
+        [[[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Could not fetch the list of conversations: %@", error.localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
     }];
     CatalyzeQuery *queryAuthor = [CatalyzeQuery queryWithClassName:@"conversations"];
     [queryAuthor setPageNumber:1];
     [queryAuthor setPageSize:20];
     [queryAuthor setQueryField:@"authorId"];
     [queryAuthor setQueryValue:[[CatalyzeUser currentUser] usersId]];
-    [queryAuthor retrieveInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
-        if (error) {
-            [[[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Could not fetch the list of conversations: %@", error.localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
-        } else {
-            [_conversations addObjectsFromArray:objects];
-            [[NSUserDefaults standardUserDefaults] setObject:_conversations forKey:kConversations];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-            [_tblConversationList reloadData];
-        }
+    [queryAuthor retrieveInBackgroundWithSuccess:^(NSArray *result) {
+        [_conversations addObjectsFromArray:result];
+        //[[NSUserDefaults standardUserDefaults] setObject:_conversations forKey:kConversations];
+        //[[NSUserDefaults standardUserDefaults] synchronize];
+        [_tblConversationList reloadData];
+    } failure:^(NSDictionary *result, int status, NSError *error) {
+        [[[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Could not fetch the list of conversations: %@", error.localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
     }];
 }
 
 - (void)addConversation {
     ContactsViewController *contactsViewController = [[ContactsViewController alloc] initWithNibName:nil bundle:nil];
     NSMutableArray *currentConversations = [NSMutableArray array];
-    for (NSDictionary *dict in _conversations) {
-        [currentConversations addObject:[[dict objectForKey:@"content"] valueForKey:@"recipient"]];
-        [currentConversations addObject:[[dict objectForKey:@"content"] valueForKey:@"sender"]];
+    for (CatalyzeEntry *entry in _conversations) {
+        [currentConversations addObject:[[entry content] valueForKey:@"recipient"]];
+        [currentConversations addObject:[[entry content] valueForKey:@"sender"]];
     }
     contactsViewController.currentConversations = currentConversations;
     [self.navigationController pushViewController:contactsViewController animated:YES];
@@ -110,10 +106,11 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     ConversationListTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ConversationListCellIdentifier"];
-    if (![[[[_conversations objectAtIndex:indexPath.row] objectForKey:@"content"] valueForKey:@"recipient_id"] isEqualToString:[[CatalyzeUser currentUser] usersId]]) {
-        [cell setCellData:[[[_conversations objectAtIndex:indexPath.row] objectForKey:@"content"] valueForKey:@"recipient"]];
+    CatalyzeEntry *conversation = [_conversations objectAtIndex:indexPath.row];
+    if (![[[conversation content] valueForKey:@"recipient_id"] isEqualToString:[[CatalyzeUser currentUser] usersId]]) {
+        [cell setCellData:[[conversation content] valueForKey:@"recipient"]];
     } else {
-        [cell setCellData:[[[_conversations objectAtIndex:indexPath.row] objectForKey:@"content"] valueForKey:@"sender"]];
+        [cell setCellData:[[conversation content] valueForKey:@"sender"]];
     }
     [cell setHighlighted:NO animated:NO];
     [cell setSelected:NO animated:NO];
@@ -141,16 +138,17 @@
     
     NSString *usersId;
     NSString *username;
-    if (![[[[_conversations objectAtIndex:indexPath.row] objectForKey:@"content"] valueForKey:@"recipient_id"] isEqualToString:[[CatalyzeUser currentUser] usersId]]) {
-        usersId = [[[_conversations objectAtIndex:indexPath.row] objectForKey:@"content"] valueForKey:@"recipient_id"];
-        username = [[[_conversations objectAtIndex:indexPath.row] objectForKey:@"content"] valueForKey:@"recipient"];
+    CatalyzeEntry *conversation = [_conversations objectAtIndex:indexPath.row];
+    if (![[[conversation content] valueForKey:@"recipient_id"] isEqualToString:[[CatalyzeUser currentUser] usersId]]) {
+        usersId = [[conversation content] valueForKey:@"recipient_id"];
+        username = [[conversation content] valueForKey:@"recipient"];
     } else {
-        usersId = [[[_conversations objectAtIndex:indexPath.row] objectForKey:@"content"] valueForKey:@"sender_id"];
-        username = [[[_conversations objectAtIndex:indexPath.row] objectForKey:@"content"] valueForKey:@"sender"];
+        usersId = [[conversation content] valueForKey:@"sender_id"];
+        username = [[conversation content] valueForKey:@"sender"];
     }
     conversationViewController.username = username;
     conversationViewController.userId = usersId;
-    conversationViewController.conversationsId = [[_conversations objectAtIndex:indexPath.row] valueForKey:@"entryId"];
+    conversationViewController.conversationsId = [conversation entryId];
     [self.navigationController pushViewController:conversationViewController animated:YES];
 }
 
