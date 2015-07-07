@@ -31,7 +31,11 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    // Override point for customization after application launch.
+    
+    if (![[NSUserDefaults standardUserDefaults] objectForKey:kConversations]) {
+        [[NSUserDefaults standardUserDefaults] setObject:[NSArray array] forKey:kConversations];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
     
     _signInViewController = [[SignInViewController alloc] initWithNibName:nil bundle:nil];
     _signInViewController.delegate = self;
@@ -92,13 +96,13 @@
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
-    NSMutableSet *unread = [NSMutableSet setWithSet:[[NSUserDefaults standardUserDefaults] objectForKey:kConversations]];
+    NSMutableSet *unread = [NSMutableSet setWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:kConversations]];
     NSString *conversationId = [userInfo valueForKey:kConversationId];
     if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive && _handler) {
         [_handler handleNotification:conversationId];
     } else {
         [unread addObject:conversationId];
-        [[NSUserDefaults standardUserDefaults] setObject:unread forKey:kConversations];
+        [[NSUserDefaults standardUserDefaults] setObject:[unread allObjects] forKey:kConversations];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     application.applicationIconBadgeNumber = unread.count;
@@ -173,9 +177,9 @@
 }
 
 - (void)openedConversation:(NSString *)conversationId {
-    NSMutableSet *unread = [NSMutableSet setWithSet:[[NSUserDefaults standardUserDefaults] objectForKey:kConversations]];
+    NSMutableSet *unread = [NSMutableSet setWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:kConversations]];
     [unread removeObject:conversationId];
-    [[NSUserDefaults standardUserDefaults] setObject:unread forKey:kConversations];
+    [[NSUserDefaults standardUserDefaults] setObject:[unread allObjects] forKey:kConversations];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [UIApplication sharedApplication].applicationIconBadgeNumber = unread.count;
 }
