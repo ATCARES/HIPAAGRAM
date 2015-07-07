@@ -18,6 +18,7 @@
 #import "HipaaGramViewController.h"
 
 @interface ConversationListViewController : HipaaGramViewController<UITableViewDataSource, UITableViewDelegate>
+
 @property (weak, nonatomic) IBOutlet UITableView *tblConversationList;
 
 @end

@@ -17,14 +17,14 @@
 #import <UIKit/UIKit.h>
 #import "SignInViewController.h"
 #import "ConversationListViewController.h"
-#import "UAirship.h"
-#import "UAConfig.h"
-#import "UAPush.h"
 #import "ConversationViewController.h"
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate, SignInDelegate, UAPushNotificationDelegate>
+@interface AppDelegate : UIResponder <UIApplicationDelegate, SignInDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 @property (strong, nonatomic) id<PushNotificationHandler> handler;
+
+- (void)logout;
+- (void)openedConversation:(NSString *)conversationId;
 
 @end

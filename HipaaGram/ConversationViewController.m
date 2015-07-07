@@ -17,8 +17,9 @@
 #import "ConversationViewController.h"
 #import "Message.h"
 #import "AppDelegate.h"
-#import "AFNetworking.h"
 #import "MessageTableViewCell.h"
+#import "AWSCore.h"
+#import "AWSSNS.h"
 
 @interface ConversationViewController ()
 
@@ -35,15 +36,6 @@
 
 @implementation ConversationViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -55,8 +47,6 @@
     _btnSend.layer.cornerRadius = 5;
     _btnSend.enabled = NO;
     
-    self.title = _username;
-    
     _messages = [NSMutableArray array];
     
     [_txtMessage addTarget:self action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
@@ -67,7 +57,7 @@
     [_tblMessages registerNib:[UINib nibWithNibName:@"MessageTableViewCell" bundle:nil] forCellReuseIdentifier:@"MessageCellIdentifier"];
     _tblMessages.transform = CGAffineTransformMakeRotation(-M_PI);
     
-    [self queryMessages];
+    [self reload];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -84,10 +74,14 @@
     [((AppDelegate *)[UIApplication sharedApplication].delegate) setHandler:nil];
 }
 
-- (void)didReceiveMemoryWarning
-{
+- (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)reload {
+    self.title = _username;
+    [self queryMessages];
 }
 
 - (void)hideKeyboard {
@@ -125,33 +119,24 @@
     } failure:^(NSDictionary *result, int status, NSError *error) {
         [[[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Could not send the message: %@", error.localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
     }];
-    
-    [_messages addObject:msg];
+    [_tblMessages beginUpdates];
+    [_messages insertObject:msg atIndex:0];
+    [_tblMessages insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationLeft];
     _txtMessage.text = @"";
     _btnSend.enabled = NO;
-    [_tblMessages reloadData];
+    [_tblMessages endUpdates];
     [self scrollToBottomAnimated:YES];
     
     [msg createInBackgroundForUserWithUsersId:_userId success:^(id result) {
-        NSLog(@"successfully saved msg");
         [self sendNotification];
     } failure:^(NSDictionary *result, int status, NSError *error) {
         [[[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Could not send the message: %@", error.localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
     }];
 }
 
-- (BOOL)textFieldShouldReturn:(UITextField *)textField {
-    [textField resignFirstResponder];
-    return YES;
-}
-
-- (void)textFieldDidChange:(UITextField *)textField {
-    _btnSend.enabled = _txtMessage.text.length > 0;
-}
-
 - (void)scrollToBottomAnimated:(BOOL)animated {
     if (_messages.count > 0) {
-        [_tblMessages scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_messages.count-1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:animated];
+        [_tblMessages scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:animated];
     }
 }
 
@@ -170,36 +155,40 @@
             }
         }
         [_messages sortUsingComparator:^NSComparisonResult(Message *msg1, Message *msg2) {
-            return [[[msg1 content] valueForKey:@"timestamp"] compare:[[msg2 content] valueForKey:@"timestamp"]];
+            return [[[msg2 content] valueForKey:@"timestamp"] compare:[[msg1 content] valueForKey:@"timestamp"]];
         }];
         [_tblMessages reloadData];
-        //[self scrollToBottomAnimated:YES];
+        [self scrollToBottomAnimated:YES];
     } failure:^(NSDictionary *result, int status, NSError *error) {
         [[[UIAlertView alloc] initWithTitle:@"Error" message:@"Could not fetch previous messages" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
     }];
 }
 
 - (void)sendNotification {
-    AFHTTPRequestOperationManager *client = [[AFHTTPRequestOperationManager alloc] initWithBaseURL:[NSURL URLWithString:@"https://go.urbanairship.com"]];
-    client.requestSerializer = [AFJSONRequestSerializer serializer];
-    [client.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-    client.responseSerializer = [AFHTTPResponseSerializer serializer];
-    [client.operationQueue setMaxConcurrentOperationCount:1];
+    AWSSNS *sns = [AWSSNS defaultSNS];
+    AWSSNSPublishInput *input = [AWSSNSPublishInput new];
+    NSString *payload = [NSString stringWithFormat:@"{\\\"aps\\\": {\\\"alert\\\": \\\"You've got a new message!\\\", \\\"badge\\\": 1, \\\"sound\\\": \\\"default\\\"}, \\\"%@\\\": \\\"%@\\\"}", kConversationId, _conversationsId];
+    input.message = [NSString stringWithFormat:@"{\"%@\": \"%@\"}", ENDPOINT_NAME, payload];
+    input.messageStructure = @"json";
+    input.targetArn = _deviceToken;
     
-    NSDictionary *ua = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"AirshipConfig" ofType:@"plist"]];
-    [client.requestSerializer setAuthorizationHeaderFieldWithUsername:[ua valueForKey:@"developmentAppKey"] password:[ua valueForKey:@"developmentMasterSecret"]];
-    
-    NSMutableDictionary *notification = [NSMutableDictionary dictionary];
-    [notification setValue:@"all" forKey:@"device_types"];
-    [notification setValue:@{@"alert":[[NSUserDefaults standardUserDefaults] valueForKey:kUserUsername]} forKey:@"notification"];
-    [notification setValue:@[_username] forKey:@"aliases"];
-    
-    [client POST:@"/api/push/" parameters:notification success:^(AFHTTPRequestOperation *operation, id responseObject) {
-        NSLog(@"successfully sent push notification");
-    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        NSLog(@"error: %@", error);
-        [[[UIAlertView alloc] initWithTitle:@"Error" message:@"Could not notify the recipient, they must refresh manually" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
+    [[sns publish:input] continueWithBlock:^id(AWSTask *task) {
+        if (task.error) {
+            NSLog(@"Push Notification Error: %@",task.error);
+        }
+        return nil;
     }];
+}
+
+#pragma mark - UITextFieldDelegate
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    [textField resignFirstResponder];
+    return YES;
+}
+
+- (void)textFieldDidChange:(UITextField *)textField {
+    _btnSend.enabled = _txtMessage.text.length > 0;
 }
 
 #pragma mark - PushNotificationHandler
