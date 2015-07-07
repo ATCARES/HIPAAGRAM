@@ -46,7 +46,7 @@
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
     
-    [Catalyze setApiKey:@"" applicationId:@""];
+    [Catalyze setApiKey:API_KEY applicationId:APP_ID];
     [Catalyze setLoggingLevel:kLoggingLevelDebug];
     
     UILocalNotification *note = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];

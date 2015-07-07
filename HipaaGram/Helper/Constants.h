@@ -14,6 +14,9 @@
  *    limitations under the License.
  */
 
+#define APP_ID @""
+#define API_KEY @""
+
 // sandbox
 #define ENDPOINT_NAME @"APNS_SANDBOX"
 #define IDENTITY_POOL_ID @""
