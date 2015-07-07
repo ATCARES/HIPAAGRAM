@@ -27,17 +27,7 @@
 
 @implementation ContactsViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
-
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     self.navigationItem.title = @"Contacts";
@@ -47,12 +37,6 @@
     [_tblContacts reloadData];
     
     [self fetchContacts];
-}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 - (void)fetchContacts {
@@ -103,6 +87,8 @@
     [[entry content] setValue:[[[_contacts objectAtIndex:indexPath.row] content] valueForKey:@"user_username"] forKey:@"recipient"];
     [[entry content] setValue:[[CatalyzeUser currentUser] usersId] forKey:@"sender_id"];
     [[entry content] setValue:[[[_contacts objectAtIndex:indexPath.row] content] valueForKey:@"user_usersId"] forKey:@"recipient_id"];
+    [[entry content] setValue:[[NSUserDefaults standardUserDefaults] valueForKey:kEndpointArn] forKey:@"sender_deviceToken"];
+    [[entry content] setValue:[[[_contacts objectAtIndex:indexPath.row] content] valueForKey:@"user_deviceToken"] forKey:@"recipient_deviceToken"];
     [entry createInBackgroundForUserWithUsersId:[[[_contacts objectAtIndex:indexPath.row] content] valueForKey:@"user_usersId"] success:^(id result) {
         [self.navigationController popViewControllerAnimated:YES];
     } failure:^(NSDictionary *result, int status, NSError *error) {

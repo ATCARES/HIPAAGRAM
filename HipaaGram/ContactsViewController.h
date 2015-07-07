@@ -18,6 +18,7 @@
 #import "HipaaGramViewController.h"
 
 @interface ContactsViewController : HipaaGramViewController<UITableViewDataSource, UITableViewDelegate, UIAlertViewDelegate>
+
 @property (weak, nonatomic) IBOutlet UITableView *tblContacts;
 @property (strong, nonatomic) NSArray *currentConversations;
 

@@ -24,10 +24,13 @@
 @end
 
 @interface ConversationViewController : UIViewController<UITableViewDataSource, UITableViewDelegate, PushNotificationHandler, UITextFieldDelegate>
+
 @property (strong, nonatomic) NSString *userId;
 @property (strong, nonatomic) NSString *username;
+@property (strong, nonatomic) NSString *deviceToken;
 @property (strong, nonatomic) NSString *conversationsId;
 
+- (void)reload;
 - (void)queryMessages;
 
 @end

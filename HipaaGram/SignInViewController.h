@@ -23,6 +23,7 @@
 @end
 
 @interface SignInViewController : UIViewController<UITextFieldDelegate>
+
 @property (strong, nonatomic) id<SignInDelegate> delegate;
 @property (weak, nonatomic) IBOutlet UITextField *txtPhoneNumber;
 @property (weak, nonatomic) IBOutlet UITextField *txtPassword;

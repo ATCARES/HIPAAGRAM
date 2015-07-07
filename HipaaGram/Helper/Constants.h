@@ -14,10 +14,25 @@
  *    limitations under the License.
  */
 
+// sandbox
+#define ENDPOINT_NAME @"APNS_SANDBOX"
+#define IDENTITY_POOL_ID @""
+#define APPLICATION_ARN @""
+
+// prod
+//#define ENDPOINT_NAME @"APNS"
+//#define IDENTITY_POOL_ID @""
+//#define APPLICATION_ARN @""
+
+#define kDeviceToken @"device_token"
+#define kEndpointArn @"endpoint_arn"
+
 #define kUserUsername @"user_username"
 #define kUserEmail @"user_email"
 #define kUserPassword @"user_password"
 
+#define kConversationId @"conversationId"
+
 #define kConversations @"conversations"
 
-typedef void (^ProxyResultBlock)(id response, int status, NSError *error);
+#define kDeviceToken @"device_token"

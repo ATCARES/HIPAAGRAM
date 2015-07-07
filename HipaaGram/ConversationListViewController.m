@@ -18,7 +18,11 @@
 #import "ConversationListTableViewCell.h"
 #import "ConversationViewController.h"
 #import "ContactsViewController.h"
+#import "SignInViewController.h"
+#import "AppDelegate.h"
 #import "Catalyze.h"
+#import "AWSCore.h"
+#import "AWSSNS.h"
 
 @interface ConversationListViewController ()
 
@@ -28,22 +32,14 @@
 
 @implementation ConversationListViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
-
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
     self.navigationItem.hidesBackButton = YES;
     self.navigationItem.title = @"Conversations";
     
+    UIBarButtonItem *logout = [[UIBarButtonItem alloc] initWithTitle:@"\uf08b" style:UIBarButtonItemStylePlain target:self action:@selector(logout)];
+    [logout setTitleTextAttributes:@{NSFontAttributeName: [UIFont fontWithName:@"FontAwesome" size:[UIFont buttonFontSize]]} forState:UIControlStateNormal];
+    self.navigationItem.leftBarButtonItem = logout;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addConversation)];
     
     _conversations = [NSMutableArray array];
@@ -57,12 +53,6 @@
     [self fetchConversationList];
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
 - (void)fetchConversationList {
     _conversations = [NSMutableArray array];
     CatalyzeQuery *query = [CatalyzeQuery queryWithClassName:@"conversations"];
@@ -70,11 +60,9 @@
     [query setPageSize:20];
     [query retrieveInBackgroundWithSuccess:^(NSArray *result) {
         [_conversations addObjectsFromArray:result];
-        //[[NSUserDefaults standardUserDefaults] setObject:_conversations forKey:kConversations];
-        //[[NSUserDefaults standardUserDefaults] synchronize];
         [_tblConversationList reloadData];
     } failure:^(NSDictionary *result, int status, NSError *error) {
-        [[[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Could not fetch the list of conversations: %@", error.localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
+        NSLog(@"Could not fetch the list of conversations you own: %@", error.localizedDescription);
     }];
     CatalyzeQuery *queryAuthor = [CatalyzeQuery queryWithClassName:@"conversations"];
     [queryAuthor setPageNumber:1];
@@ -83,11 +71,9 @@
     [queryAuthor setQueryValue:[[CatalyzeUser currentUser] usersId]];
     [queryAuthor retrieveInBackgroundWithSuccess:^(NSArray *result) {
         [_conversations addObjectsFromArray:result];
-        //[[NSUserDefaults standardUserDefaults] setObject:_conversations forKey:kConversations];
-        //[[NSUserDefaults standardUserDefaults] synchronize];
         [_tblConversationList reloadData];
     } failure:^(NSDictionary *result, int status, NSError *error) {
-        [[[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Could not fetch the list of conversations: %@", error.localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
+        NSLog(@"Could not fetch the list of conversations you author: %@", error.localizedDescription);
     }];
 }
 
@@ -100,6 +86,10 @@
     }
     contactsViewController.currentConversations = currentConversations;
     [self.navigationController pushViewController:contactsViewController animated:YES];
+}
+
+- (void)logout {
+    [(AppDelegate *)[[UIApplication sharedApplication] delegate] logout];
 }
 
 #pragma mark - UITableViewDataSource
@@ -132,24 +122,33 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [[tableView cellForRowAtIndexPath:indexPath] setHighlighted:NO animated:YES];
-    [[tableView cellForRowAtIndexPath:indexPath] setSelected:NO animated:YES];
-    ConversationViewController *conversationViewController = [[ConversationViewController alloc] initWithNibName:nil bundle:nil];
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    NSString *usersId;
-    NSString *username;
     CatalyzeEntry *conversation = [_conversations objectAtIndex:indexPath.row];
-    if (![[[conversation content] valueForKey:@"recipient_id"] isEqualToString:[[CatalyzeUser currentUser] usersId]]) {
-        usersId = [[conversation content] valueForKey:@"recipient_id"];
-        username = [[conversation content] valueForKey:@"recipient"];
-    } else {
-        usersId = [[conversation content] valueForKey:@"sender_id"];
-        username = [[conversation content] valueForKey:@"sender"];
+    
+    [(AppDelegate *)[[UIApplication sharedApplication] delegate] openedConversation:[conversation entryId]];
+    
+    ConversationViewController *conversationViewController = [[ConversationViewController alloc] initWithNibName:nil bundle:nil];
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        // if we're on an ipad, this VC already exists as the detail view of a split VC
+        conversationViewController = (ConversationViewController *)((UINavigationController *)self.splitViewController.viewControllers.lastObject).viewControllers.lastObject;
     }
-    conversationViewController.username = username;
-    conversationViewController.userId = usersId;
+    
+    NSString *prefix;
+    if (![[[conversation content] valueForKey:@"recipient_id"] isEqualToString:[[CatalyzeUser currentUser] usersId]]) {
+        prefix = @"recipient";
+    } else {
+        prefix = @"sender";
+    }
+    conversationViewController.username = [[conversation content] valueForKey:[NSString stringWithFormat:@"%@", prefix]];
+    conversationViewController.userId = [[conversation content] valueForKey:[NSString stringWithFormat:@"%@_id", prefix]];
+    conversationViewController.deviceToken = [[conversation content] valueForKey:[NSString stringWithFormat:@"%@_deviceToken", prefix]];
     conversationViewController.conversationsId = [conversation entryId];
-    [self.navigationController pushViewController:conversationViewController animated:YES];
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        [conversationViewController reload];
+    } else {
+        [self.navigationController pushViewController:conversationViewController animated:YES];
+    }
 }
 
 @end
