@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Catalyze, Inc.
+ * Copyright (C) 2015 Catalyze, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,5 +26,8 @@
 
 - (void)logout;
 - (void)openedConversation:(NSString *)conversationId;
+- (void)updateConversations:(NSArray *)conversations withDeviceToken:(NSString *)deviceToken;
+- (NSInteger)totalUnreadNotifications;
+- (NSInteger)totalUnreadNotifications:(NSDictionary *)unread;
 
 @end

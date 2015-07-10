@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Catalyze, Inc.
+ * Copyright (C) 2015 Catalyze, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 
 #import "HipaaGramViewController.h"
+#import "Catalyze.h"
 
 @interface HipaaGramViewController ()
 
@@ -24,10 +25,24 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
     self.navigationController.navigationBarHidden = NO;
     self.navigationController.navigationBar.backItem.title = @"";
-    self.navigationItem.backBarButtonItem.title = @"";
+    self.navigationItem.hidesBackButton = YES;
+}
+
+- (void)back {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (void)startConversation:(CatalyzeEntry *)contact success:(CatalyzeSuccessBlock)success failure:(CatalyzeFailureBlock)failure {
+    CatalyzeEntry *entry = [CatalyzeEntry entryWithClassName:@"conversations"];
+    [[entry content] setValue:[[NSUserDefaults standardUserDefaults] valueForKey:kUserUsername] forKey:@"sender"];
+    [[entry content] setValue:[[contact content] valueForKey:kUserUsername] forKey:@"recipient"];
+    [[entry content] setValue:[[CatalyzeUser currentUser] usersId] forKey:@"sender_id"];
+    [[entry content] setValue:[[contact content] valueForKey:@"user_usersId"] forKey:@"recipient_id"];
+    [[entry content] setValue:[[NSUserDefaults standardUserDefaults] valueForKey:kEndpointArn] forKey:@"sender_deviceToken"];
+    [[entry content] setValue:[[contact content] valueForKey:kUserDeviceToken] forKey:@"recipient_deviceToken"];
+    [entry createInBackgroundForUserWithUsersId:[[contact content] valueForKey:@"user_usersId"] success:success failure:failure];
 }
 
 @end

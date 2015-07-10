@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Catalyze, Inc.
+ * Copyright (C) 2015 Catalyze, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -29,8 +29,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
     self.navigationItem.title = @"Contacts";
+    
+    UIBarButtonItem *left = [[UIBarButtonItem alloc] initWithTitle:@"Back" style:UIBarButtonItemStylePlain target:self action:@selector(back)];
+    [left setTitleTextAttributes:@{NSFontAttributeName: [UIFont fontWithName:@"AvenirNext-Medium" size:18.0]} forState:UIControlStateNormal];
+    self.navigationItem.leftBarButtonItem = left;
     
     _contacts = [NSMutableArray array];
     [_tblContacts registerNib:[UINib nibWithNibName:@"ContactTableViewCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"ContactCellIdentifier"];
@@ -47,6 +50,7 @@
         for (CatalyzeEntry *entry in result) {
             if (![[[entry content] valueForKey:@"user_username"] isEqualToString:[[NSUserDefaults standardUserDefaults] valueForKey:kUserUsername]] && ![_currentConversations containsObject:[[entry content] valueForKey:@"user_username"]]) {
                 [_contacts addObject:entry];
+                [_currentConversations addObject:[[entry content] valueForKey:@"user_username"]];
             }
         }
         [_tblContacts reloadData];
@@ -82,14 +86,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [[tableView cellForRowAtIndexPath:indexPath] setSelected:NO animated:YES];
     [[tableView cellForRowAtIndexPath:indexPath] setHighlighted:NO animated:YES];
-    CatalyzeEntry *entry = [CatalyzeEntry entryWithClassName:@"conversations"];
-    [[entry content] setValue:[[NSUserDefaults standardUserDefaults] valueForKey:kUserUsername] forKey:@"sender"];
-    [[entry content] setValue:[[[_contacts objectAtIndex:indexPath.row] content] valueForKey:@"user_username"] forKey:@"recipient"];
-    [[entry content] setValue:[[CatalyzeUser currentUser] usersId] forKey:@"sender_id"];
-    [[entry content] setValue:[[[_contacts objectAtIndex:indexPath.row] content] valueForKey:@"user_usersId"] forKey:@"recipient_id"];
-    [[entry content] setValue:[[NSUserDefaults standardUserDefaults] valueForKey:kEndpointArn] forKey:@"sender_deviceToken"];
-    [[entry content] setValue:[[[_contacts objectAtIndex:indexPath.row] content] valueForKey:@"user_deviceToken"] forKey:@"recipient_deviceToken"];
-    [entry createInBackgroundForUserWithUsersId:[[[_contacts objectAtIndex:indexPath.row] content] valueForKey:@"user_usersId"] success:^(id result) {
+    [self startConversation:[_contacts objectAtIndex:indexPath.row] success:^(id result) {
         [self.navigationController popViewControllerAnimated:YES];
     } failure:^(NSDictionary *result, int status, NSError *error) {
         [[[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Could not start conversation: %@", error.localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];

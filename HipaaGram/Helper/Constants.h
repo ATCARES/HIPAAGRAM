@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Catalyze, Inc.
+ * Copyright (C) 2015 Catalyze, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,6 +13,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+//#define LIST_CONTACTS
+
+#define GREEN_r 61.0/255.0
+#define GREEN_g 210.0/255.0
+#define GREEN_b 145.0/255.0
 
 #define APP_ID @""
 #define API_KEY @""
@@ -32,10 +38,10 @@
 
 #define kUserUsername @"user_username"
 #define kUserEmail @"user_email"
-#define kUserPassword @"user_password"
+#define kUserDeviceToken @"user_deviceToken"
 
 #define kConversationId @"conversationId"
 
 #define kConversations @"conversations"
 
-#define kDeviceToken @"device_token"
+#define kNotificationReceived @"notification_received"

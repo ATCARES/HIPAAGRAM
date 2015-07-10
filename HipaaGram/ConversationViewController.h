@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Catalyze, Inc.
+ * Copyright (C) 2015 Catalyze, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,11 +19,12 @@
 
 @protocol PushNotificationHandler <NSObject>
 
+- (NSString *)handlerFor;
 - (void)handleNotification:(NSString *)fromNumber;
 
 @end
 
-@interface ConversationViewController : UIViewController<UITableViewDataSource, UITableViewDelegate, PushNotificationHandler, UITextFieldDelegate>
+@interface ConversationViewController : HipaaGramViewController<UITableViewDataSource, UITableViewDelegate, PushNotificationHandler, UITextFieldDelegate>
 
 @property (strong, nonatomic) NSString *userId;
 @property (strong, nonatomic) NSString *username;

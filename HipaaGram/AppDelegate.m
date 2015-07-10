@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Catalyze, Inc.
+ * Copyright (C) 2015 Catalyze, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -33,32 +33,30 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
     if (![[NSUserDefaults standardUserDefaults] objectForKey:kConversations]) {
-        [[NSUserDefaults standardUserDefaults] setObject:[NSArray array] forKey:kConversations];
+        [[NSUserDefaults standardUserDefaults] setObject:[NSDictionary dictionary] forKey:kConversations];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
+    
+    UIColor *green = [UIColor colorWithRed:GREEN_r green:GREEN_g blue:GREEN_b alpha:1.0f];
+    [[UINavigationBar appearance] setTintColor:green];
+    [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName: green, NSFontAttributeName: [UIFont fontWithName:@"AvenirNext-Bold" size:18.0]}];
     
     _signInViewController = [[SignInViewController alloc] initWithNibName:nil bundle:nil];
     _signInViewController.delegate = self;
     _controller = [[UINavigationController alloc] initWithRootViewController:_signInViewController];
     self.window.rootViewController = _controller;
     
-    UIUserNotificationType types = UIUserNotificationTypeBadge | UIUserNotificationTypeAlert | UIUserNotificationTypeSound;
-    UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:types categories:nil];
-    [application registerUserNotificationSettings:settings];
-    [application registerForRemoteNotifications];
-    
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
     
     [Catalyze setApiKey:API_KEY applicationId:APP_ID];
-    [Catalyze setLoggingLevel:kLoggingLevelDebug];
+    [Catalyze setLoggingLevel:kLoggingLevelOff];
     
     UILocalNotification *note = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
     if (note) {
         // we opened the app by tapping on a notification
-        //application.applicationIconBadgeNumber = note.applicationIconBadgeNumber-1;
+        // TODO open that conversation
     }
-    application.applicationIconBadgeNumber = 0;
     
     return YES;
 }
@@ -89,6 +87,33 @@
     NSString *deviceTokenString = [[[deviceToken description] stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"<>"]] stringByReplacingOccurrencesOfString:@" " withString:@""];
     [[NSUserDefaults standardUserDefaults] setObject:deviceTokenString forKey:kDeviceToken];
     [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    AWSCognitoCredentialsProvider *credentialsProvider = [[AWSCognitoCredentialsProvider alloc] initWithRegionType:AWSRegionUSEast1 identityPoolId:IDENTITY_POOL_ID];
+    
+    AWSServiceConfiguration *configuration = [[AWSServiceConfiguration alloc] initWithRegion:AWSRegionUSEast1
+                                                                         credentialsProvider:credentialsProvider];
+    
+    [AWSServiceManager defaultServiceManager].defaultServiceConfiguration = configuration;
+    
+    AWSSNS *sns = [AWSSNS defaultSNS];
+    AWSSNSCreatePlatformEndpointInput *request = [AWSSNSCreatePlatformEndpointInput new];
+    request.token = deviceTokenString;
+    request.platformApplicationArn = APPLICATION_ARN;
+    [[sns createPlatformEndpoint:request] continueWithBlock:^id(AWSTask *task) {
+        if (task.error) {
+            NSLog(@"Error: %@",task.error);
+        } else {
+            AWSSNSCreateEndpointResponse *createEndPointResponse = task.result;
+            NSString *oldEndpointArn = [[NSUserDefaults standardUserDefaults] valueForKey:kEndpointArn];
+            [[NSUserDefaults standardUserDefaults] setObject:createEndPointResponse.endpointArn forKey:kEndpointArn];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            if (![createEndPointResponse.endpointArn isEqualToString:oldEndpointArn]) {
+                // we must go update our endpoint ARN in all conversations and our contacts class.
+                _conversationListViewController.updateDeviceToken = YES;
+            }
+        }
+        return nil;
+    }];
 }
 
 - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
@@ -96,53 +121,42 @@
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
-    NSMutableSet *unread = [NSMutableSet setWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:kConversations]];
+    NSMutableDictionary *unread = [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:kConversations]];
     NSString *conversationId = [userInfo valueForKey:kConversationId];
-    if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive && _handler) {
+    // if this conversation is active, tell the handler. otherwise add it to the unread count
+    if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive && _handler && [[_handler handlerFor] isEqualToString:conversationId]) {
         [_handler handleNotification:conversationId];
     } else {
-        [unread addObject:conversationId];
-        [[NSUserDefaults standardUserDefaults] setObject:[unread allObjects] forKey:kConversations];
+        NSInteger conversationUnread = [[unread objectForKey:conversationId] integerValue];
+        [unread setValue:@(++conversationUnread) forKey:conversationId];
+        [[NSUserDefaults standardUserDefaults] setObject:unread forKey:kConversations];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
-    application.applicationIconBadgeNumber = unread.count;
+    
+    NSInteger totalUnread = [self totalUnreadNotifications:unread];
+    
+    application.applicationIconBadgeNumber = totalUnread;
+    [_conversationListViewController.tblConversationList reloadData];
+    NSString *modifier = totalUnread > 0 ? [NSString stringWithFormat:@" (%ld)", totalUnread] : @"";
+    _conversationListViewController.title = [NSString stringWithFormat:@"Conversations%@", modifier];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kNotificationReceived object:nil userInfo:@{@"unread": @(totalUnread)}];
 }
 
 #pragma mark - SignInDelegate
 
 - (void)signInSuccessful {
-    [_signInViewController.view endEditing:YES];
-    _signInViewController.txtPhoneNumber.text = @"";
-    _signInViewController.txtPassword.text = @"";
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        AWSCognitoCredentialsProvider *credentialsProvider = [[AWSCognitoCredentialsProvider alloc] initWithRegionType:AWSRegionUSEast1 identityPoolId:IDENTITY_POOL_ID];
-        
-        AWSServiceConfiguration *configuration = [[AWSServiceConfiguration alloc] initWithRegion:AWSRegionUSEast1
-                                                                             credentialsProvider:credentialsProvider];
-        
-        [AWSServiceManager defaultServiceManager].defaultServiceConfiguration = configuration;
-        
-        AWSSNS *sns = [AWSSNS defaultSNS];
-        AWSSNSCreatePlatformEndpointInput *request = [AWSSNSCreatePlatformEndpointInput new];
-        request.token = [[NSUserDefaults standardUserDefaults] valueForKey:kDeviceToken];
-        request.platformApplicationArn = APPLICATION_ARN;
-        request.customUserData = [[CatalyzeUser currentUser] username]; // most likely will be nil here, but set it anyway
-        [[sns createPlatformEndpoint:request] continueWithBlock:^id(AWSTask *task) {
-            if (task.error) {
-                NSLog(@"Error: %@",task.error);
-            } else {
-                AWSSNSCreateEndpointResponse *createEndPointResponse = task.result;
-                NSLog(@"endpointArn: %@",createEndPointResponse);
-                [[NSUserDefaults standardUserDefaults] setObject:createEndPointResponse.endpointArn forKey:kEndpointArn];
-                [[NSUserDefaults standardUserDefaults] synchronize];
-            }
-            return nil;
-        }];
+    // this is called on a background thread, so updating the UI has to be done on the main thread
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [_signInViewController.view endEditing:YES];
+        _signInViewController.txtPhoneNumber.text = @"";
+        _signInViewController.txtPassword.text = @"";
     });
     
+    _conversationListViewController = [[ConversationListViewController alloc] initWithNibName:nil bundle:nil];
+    // if we're on an iPad, use a split VC
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         UISplitViewController *split = [[UISplitViewController alloc] init];
-        _conversationListViewController = [[ConversationListViewController alloc] initWithNibName:nil bundle:nil];
         
         ConversationViewController *conversationViewController = [[ConversationViewController alloc] initWithNibName:nil bundle:nil];
         
@@ -153,35 +167,79 @@
         
         [_controller presentViewController:split animated:true completion:nil];
     } else {
-        _conversationListViewController = [[ConversationListViewController alloc] initWithNibName:nil bundle:nil];
         [_controller pushViewController:_conversationListViewController animated:YES];
     }
+    
+    UIUserNotificationType types = UIUserNotificationTypeBadge | UIUserNotificationTypeAlert | UIUserNotificationTypeSound;
+    UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:types categories:nil];
+    [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
+    [[UIApplication sharedApplication] registerForRemoteNotifications];
 }
 
 - (void)logout {
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kUserUsername];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kUserEmail];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kConversations];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
     [[CatalyzeUser currentUser] logout];
-    AWSSNS *sns = [AWSSNS defaultSNS];
-    AWSSNSDeleteEndpointInput *input = [AWSSNSDeleteEndpointInput new];
-    input.endpointArn = [[NSUserDefaults standardUserDefaults] valueForKey:kEndpointArn];
-    [[sns deleteEndpoint:input] continueWithBlock:^id(AWSTask *task) {
-        if (task.error) {
-            NSLog(@"Error: %@",task.error);
-        }
-        _signInViewController = [[SignInViewController alloc] initWithNibName:nil bundle:nil];
-        _signInViewController.delegate = self;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [_controller popToRootViewControllerAnimated:YES];
-        });
-        return nil;
-    }];
+    [[UIApplication sharedApplication] unregisterForRemoteNotifications];
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        [[_controller presentedViewController] dismissViewControllerAnimated:YES completion:nil];
+    } else {
+        [_controller popToRootViewControllerAnimated:YES];
+    }
 }
 
 - (void)openedConversation:(NSString *)conversationId {
-    NSMutableSet *unread = [NSMutableSet setWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:kConversations]];
-    [unread removeObject:conversationId];
-    [[NSUserDefaults standardUserDefaults] setObject:[unread allObjects] forKey:kConversations];
+    NSMutableDictionary *unread = [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:kConversations]];
+    [unread removeObjectForKey:conversationId];
+    [[NSUserDefaults standardUserDefaults] setObject:unread forKey:kConversations];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    [UIApplication sharedApplication].applicationIconBadgeNumber = unread.count;
+    
+    NSInteger totalUnread = [self totalUnreadNotifications:unread];
+    
+    [UIApplication sharedApplication].applicationIconBadgeNumber = totalUnread;
+    [_conversationListViewController.tblConversationList reloadData];
+    NSString *modifier = totalUnread > 0 ? [NSString stringWithFormat:@" (%ld)", totalUnread] : @"";
+    _conversationListViewController.title = [NSString stringWithFormat:@"Conversations%@", modifier];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kNotificationReceived object:nil userInfo:@{@"unread": @(totalUnread)}];
+}
+
+- (void)updateConversations:(NSArray *)conversations withDeviceToken:(NSString *)deviceToken {
+    for (CatalyzeEntry *conversation in conversations) {
+        if ([[[conversation content] valueForKey:@"sender_id"] isEqualToString:[[CatalyzeUser currentUser] usersId]]) {
+            [[conversation content] setObject:deviceToken forKey:@"sender_deviceToken"];
+        } else {
+            [[conversation content] setObject:deviceToken forKey:@"recipient_deviceToken"];
+        }
+        [conversation saveInBackground];
+    }
+    CatalyzeQuery *query = [CatalyzeQuery queryWithClassName:@"contacts"];
+    query.queryField = kUserUsername;
+    query.queryValue = [[CatalyzeUser currentUser] username];
+    query.pageNumber = 1;
+    query.pageSize = 1;
+    [query retrieveInBackgroundWithSuccess:^(NSArray *result) {
+        CatalyzeEntry *contact = [result objectAtIndex:0];
+        [[contact content] setObject:deviceToken forKey:kUserDeviceToken];
+        [contact saveInBackground];
+    } failure:^(NSDictionary *result, int status, NSError *error) {
+        NSLog(@"failed to update our contact with the latest device token: %@ %@", result, error);
+    }];
+}
+
+- (NSInteger)totalUnreadNotifications {
+    return [self totalUnreadNotifications:[NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:kConversations]]];
+}
+
+- (NSInteger)totalUnreadNotifications:(NSDictionary *)unread {
+    NSInteger totalUnread = 0;
+    for (NSString *key in [unread allKeys]) {
+        totalUnread += [[unread valueForKey:key] integerValue];
+    }
+    return totalUnread;
 }
 
 @end

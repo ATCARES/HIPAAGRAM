@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Catalyze, Inc.
+ * Copyright (C) 2015 Catalyze, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,8 +18,18 @@
 
 @implementation ConversationListTableViewCell
 
-- (void)setCellData:(NSString *)recipient {
+- (void)awakeFromNib {
+    _circleView.layer.cornerRadius = 5;
+}
+
+- (void)setCellData:(NSString *)recipient unread:(BOOL)unread {
     _lblRecipient.text = recipient;
+    _circleView.hidden = !unread;
+    if (unread) {
+        _lblRecipient.font = [UIFont fontWithName:@"AvenirNext-Bold" size:18.0];
+    } else {
+        _lblRecipient.font = [UIFont fontWithName:@"AvenirNext-Medium" size:18.0];
+    }
 }
 
 @end

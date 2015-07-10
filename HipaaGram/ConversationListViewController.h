@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Catalyze, Inc.
+ * Copyright (C) 2015 Catalyze, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,7 +17,10 @@
 #import <UIKit/UIKit.h>
 #import "HipaaGramViewController.h"
 
-@interface ConversationListViewController : HipaaGramViewController<UITableViewDataSource, UITableViewDelegate>
+@interface ConversationListViewController : HipaaGramViewController<UITableViewDataSource, UITableViewDelegate, UIAlertViewDelegate>
+
+@property (strong, nonatomic) NSMutableArray *conversations;
+@property BOOL updateDeviceToken;
 
 @property (weak, nonatomic) IBOutlet UITableView *tblConversationList;
 

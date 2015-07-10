@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Catalyze, Inc.
+ * Copyright (C) 2015 Catalyze, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,8 +26,6 @@
 
 @interface ConversationListViewController ()
 
-@property (strong, nonatomic) NSMutableArray *conversations;
-
 @end
 
 @implementation ConversationListViewController
@@ -35,12 +33,23 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.navigationItem.hidesBackButton = YES;
-    self.navigationItem.title = @"Conversations";
+    NSInteger totalUnread = [(AppDelegate *)[UIApplication sharedApplication].delegate totalUnreadNotifications];
+    NSString *modifier = totalUnread > 0 ? [NSString stringWithFormat:@" (%ld)", totalUnread] : @"";
+    self.navigationItem.title = [NSString stringWithFormat:@"Conversations%@", modifier];
     
-    UIBarButtonItem *logout = [[UIBarButtonItem alloc] initWithTitle:@"\uf08b" style:UIBarButtonItemStylePlain target:self action:@selector(logout)];
-    [logout setTitleTextAttributes:@{NSFontAttributeName: [UIFont fontWithName:@"FontAwesome" size:[UIFont buttonFontSize]]} forState:UIControlStateNormal];
-    self.navigationItem.leftBarButtonItem = logout;
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addConversation)];
+    _updateDeviceToken = NO;
+    
+    UIBarButtonItem *left = [[UIBarButtonItem alloc] initWithTitle:@"Sign Out" style:UIBarButtonItemStylePlain target:self action:@selector(logout)];
+    [left setTitleTextAttributes:@{NSFontAttributeName: [UIFont fontWithName:@"AvenirNext-Medium" size:18.0]} forState:UIControlStateNormal];
+    self.navigationItem.leftBarButtonItem = left;
+    
+#ifdef LIST_CONTACTS
+    UIBarButtonItem *right = [[UIBarButtonItem alloc] initWithTitle:@"+" style:UIBarButtonItemStylePlain target:self action:@selector(addConversation)];
+#else
+    UIBarButtonItem *right = [[UIBarButtonItem alloc] initWithTitle:@"+" style:UIBarButtonItemStylePlain target:self action:@selector(typeUsername)];
+#endif
+    [right setTitleTextAttributes:@{NSFontAttributeName: [UIFont fontWithName:@"AvenirNext-Medium" size:28.0]} forState:UIControlStateNormal];
+    self.navigationItem.rightBarButtonItem = right;
     
     _conversations = [NSMutableArray array];
     
@@ -57,7 +66,7 @@
     _conversations = [NSMutableArray array];
     CatalyzeQuery *query = [CatalyzeQuery queryWithClassName:@"conversations"];
     [query setPageNumber:1];
-    [query setPageSize:20];
+    [query setPageSize:50];
     [query retrieveInBackgroundWithSuccess:^(NSArray *result) {
         [_conversations addObjectsFromArray:result];
         [_tblConversationList reloadData];
@@ -66,12 +75,18 @@
     }];
     CatalyzeQuery *queryAuthor = [CatalyzeQuery queryWithClassName:@"conversations"];
     [queryAuthor setPageNumber:1];
-    [queryAuthor setPageSize:20];
+    [queryAuthor setPageSize:50];
     [queryAuthor setQueryField:@"authorId"];
     [queryAuthor setQueryValue:[[CatalyzeUser currentUser] usersId]];
     [queryAuthor retrieveInBackgroundWithSuccess:^(NSArray *result) {
         [_conversations addObjectsFromArray:result];
         [_tblConversationList reloadData];
+        if (_updateDeviceToken) {
+            _updateDeviceToken = NO;
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                [(AppDelegate *)[UIApplication sharedApplication].delegate updateConversations:_conversations withDeviceToken:[[NSUserDefaults standardUserDefaults] valueForKey:kEndpointArn]];
+            });
+        }
     } failure:^(NSDictionary *result, int status, NSError *error) {
         NSLog(@"Could not fetch the list of conversations you author: %@", error.localizedDescription);
     }];
@@ -79,13 +94,19 @@
 
 - (void)addConversation {
     ContactsViewController *contactsViewController = [[ContactsViewController alloc] initWithNibName:nil bundle:nil];
-    NSMutableArray *currentConversations = [NSMutableArray array];
+    NSMutableSet *currentConversations = [NSMutableSet set];
     for (CatalyzeEntry *entry in _conversations) {
         [currentConversations addObject:[[entry content] valueForKey:@"recipient"]];
         [currentConversations addObject:[[entry content] valueForKey:@"sender"]];
     }
-    contactsViewController.currentConversations = currentConversations;
+    contactsViewController.currentConversations = [NSMutableArray arrayWithArray:[currentConversations allObjects]];
     [self.navigationController pushViewController:contactsViewController animated:YES];
+}
+
+- (void)typeUsername {
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"Who do you want to chat with today? (type their username)" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"OK", nil];
+    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [alert show];
 }
 
 - (void)logout {
@@ -97,10 +118,11 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     ConversationListTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ConversationListCellIdentifier"];
     CatalyzeEntry *conversation = [_conversations objectAtIndex:indexPath.row];
+    BOOL unread = [[[NSDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:kConversations]] valueForKey:conversation.entryId] integerValue] > 0;
     if (![[[conversation content] valueForKey:@"recipient_id"] isEqualToString:[[CatalyzeUser currentUser] usersId]]) {
-        [cell setCellData:[[conversation content] valueForKey:@"recipient"]];
+        [cell setCellData:[[conversation content] valueForKey:@"recipient"] unread:unread];
     } else {
-        [cell setCellData:[[conversation content] valueForKey:@"sender"]];
+        [cell setCellData:[[conversation content] valueForKey:@"sender"] unread:unread];
     }
     [cell setHighlighted:NO animated:NO];
     [cell setSelected:NO animated:NO];
@@ -149,6 +171,51 @@
     } else {
         [self.navigationController pushViewController:conversationViewController animated:YES];
     }
+}
+
+#pragma mark - UIAlertViewDelegate
+
+- (void)alertView:(nonnull UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if (buttonIndex == 1) {
+        [alertView dismissWithClickedButtonIndex:0 animated:YES];
+        NSString *username = [alertView textFieldAtIndex:0].text;
+        if (username.length > 0) {
+            if ([self conversationAlreadyExists:username]) {
+                [[[UIAlertView alloc] initWithTitle:@"Oops!" message:[NSString stringWithFormat:@"A conversation with %@ has already been started. Tap on their name to start chatting", username] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
+                return;
+            }
+            CatalyzeQuery *query = [CatalyzeQuery queryWithClassName:@"contacts"];
+            query.queryField = kUserUsername;
+            query.queryValue = username;
+            query.pageNumber = 1;
+            query.pageSize = 1;
+            [query retrieveAllEntriesInBackgroundWithSuccess:^(NSArray *result) {
+                if (result.count == 0) {
+                    [[[UIAlertView alloc] initWithTitle:@"Uh-oh" message:[NSString stringWithFormat:@"A user with username %@ does not exist. Let's try that again", username] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
+                } else {
+                    // start the conversation
+                    [self startConversation:[result objectAtIndex:0] success:^(id result) {
+                        [self fetchConversationList];
+                    } failure:^(NSDictionary *result, int status, NSError *error) {
+                        [[[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Could not start conversation: %@", error.localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
+                    }];
+                }
+            } failure:^(NSDictionary *result, int status, NSError *error) {
+                [[[UIAlertView alloc] initWithTitle:@"Error" message:@"Could not check if that user exists, please try again" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
+            }];
+        }
+    }
+}
+
+- (BOOL)conversationAlreadyExists:(NSString *)user {
+    BOOL exists = NO;
+    for (CatalyzeEntry *conversation in _conversations) {
+        if ([[[conversation content] valueForKey:@"sender"] isEqualToString:user] || [[[conversation content] valueForKey:@"recipient"] isEqualToString:user]) {
+            exists = YES;
+            break;
+        }
+    }
+    return exists;
 }
 
 @end

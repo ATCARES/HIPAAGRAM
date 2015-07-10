@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Catalyze, Inc.
+ * Copyright (C) 2015 Catalyze, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,7 +15,11 @@
  */
 
 #import <UIKit/UIKit.h>
+#import "Catalyze.h"
 
 @interface HipaaGramViewController : UIViewController
+
+- (void)back;
+- (void)startConversation:(CatalyzeEntry *)contact success:(CatalyzeSuccessBlock)success failure:(CatalyzeFailureBlock)failure;
 
 @end

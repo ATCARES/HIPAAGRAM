@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Catalyze, Inc.
+ * Copyright (C) 2015 Catalyze, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,7 +20,8 @@
 @interface ConversationListTableViewCell : UITableViewCell
 
 @property (weak, nonatomic) IBOutlet UILabel *lblRecipient;
+@property (weak, nonatomic) IBOutlet UIView *circleView;
 
-- (void)setCellData:(NSString *)recipient;
+- (void)setCellData:(NSString *)recipient unread:(BOOL)unread;
 
 @end

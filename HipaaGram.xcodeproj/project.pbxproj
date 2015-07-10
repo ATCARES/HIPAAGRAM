@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		272C50101B4AF25500953785 /* fontawesome-webfont.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 272C500F1B4AF25500953785 /* fontawesome-webfont.ttf */; };
 		2736C3C71A954EAF00BB9879 /* ConversationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2736C3C61A954EAF00BB9879 /* ConversationViewController.m */; };
 		2736C3C91A954EC500BB9879 /* ConversationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2736C3C81A954EC500BB9879 /* ConversationViewController.xib */; };
 		2736C3CF1A95AE7100BB9879 /* MessageTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 2736C3CD1A95AE7100BB9879 /* MessageTableViewCell.m */; };
@@ -62,7 +61,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		272C500F1B4AF25500953785 /* fontawesome-webfont.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "fontawesome-webfont.ttf"; sourceTree = "<group>"; };
 		2736C3C51A954EAF00BB9879 /* ConversationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConversationViewController.h; sourceTree = "<group>"; };
 		2736C3C61A954EAF00BB9879 /* ConversationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConversationViewController.m; sourceTree = "<group>"; };
 		2736C3C81A954EC500BB9879 /* ConversationViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ConversationViewController.xib; sourceTree = "<group>"; };
@@ -159,19 +157,9 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		272C500E1B4AF25500953785 /* Fonts */ = {
-			isa = PBXGroup;
-			children = (
-				272C500F1B4AF25500953785 /* fontawesome-webfont.ttf */,
-			);
-			name = Fonts;
-			path = HipaaGram/Fonts;
-			sourceTree = "<group>";
-		};
 		27709660190EA2C1006D2E6D = {
 			isa = PBXGroup;
 			children = (
-				272C500E1B4AF25500953785 /* Fonts */,
 				27709735190EC43F006D2E6D /* Helper */,
 				277096CA190EAE6D006D2E6D /* Models */,
 				277096B7190EA5CC006D2E6D /* UITableViewCells */,
@@ -409,7 +397,6 @@
 				27709677190EA2C1006D2E6D /* InfoPlist.strings in Resources */,
 				277096B4190EA4C5006D2E6D /* ConversationListViewController.xib in Resources */,
 				2736C3D01A95AE7100BB9879 /* MessageTableViewCell.xib in Resources */,
-				272C50101B4AF25500953785 /* fontawesome-webfont.ttf in Resources */,
 				277096A1190EA2EF006D2E6D /* SignInViewController.xib in Resources */,
 				2770967F190EA2C1006D2E6D /* Images.xcassets in Resources */,
 			);
@@ -610,15 +597,42 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "HipaaGram/HipaaGram-Prefix.pch";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"../Airship/**\"",
-				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "HipaaGram/HipaaGram-Info.plist";
-				LIBRARY_SEARCH_PATHS = (
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_LDFLAGS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/libUAirship-latest/Airship",
-					"$(PROJECT_DIR)/Airship",
+					"-ObjC",
+					"-l\"Pods-AFNetworkActivityLogger\"",
+					"-l\"Pods-AFNetworking\"",
+					"-l\"Pods-AWSAutoScaling\"",
+					"-l\"Pods-AWSCloudWatch\"",
+					"-l\"Pods-AWSCore\"",
+					"-l\"Pods-AWSDynamoDB\"",
+					"-l\"Pods-AWSEC2\"",
+					"-l\"Pods-AWSElasticLoadBalancing\"",
+					"-l\"Pods-AWSKinesis\"",
+					"-l\"Pods-AWSMobileAnalytics\"",
+					"-l\"Pods-AWSS3\"",
+					"-l\"Pods-AWSSES\"",
+					"-l\"Pods-AWSSNS\"",
+					"-l\"Pods-AWSSQS\"",
+					"-l\"Pods-AWSSimpleDB\"",
+					"-l\"Pods-catalyze-ios-sdk\"",
+					"-l\"sqlite3\"",
+					"-l\"z\"",
+					"-framework",
+					"\"CoreGraphics\"",
+					"-framework",
+					"\"Foundation\"",
+					"-framework",
+					"\"MobileCoreServices\"",
+					"-framework",
+					"\"Security\"",
+					"-framework",
+					"\"SystemConfiguration\"",
+					"-framework",
+					"\"UIKit\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "io.catalyze.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -637,15 +651,42 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "HipaaGram/HipaaGram-Prefix.pch";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"../Airship/**\"",
-				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "HipaaGram/HipaaGram-Info.plist";
-				LIBRARY_SEARCH_PATHS = (
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_LDFLAGS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/libUAirship-latest/Airship",
-					"$(PROJECT_DIR)/Airship",
+					"-ObjC",
+					"-l\"Pods-AFNetworkActivityLogger\"",
+					"-l\"Pods-AFNetworking\"",
+					"-l\"Pods-AWSAutoScaling\"",
+					"-l\"Pods-AWSCloudWatch\"",
+					"-l\"Pods-AWSCore\"",
+					"-l\"Pods-AWSDynamoDB\"",
+					"-l\"Pods-AWSEC2\"",
+					"-l\"Pods-AWSElasticLoadBalancing\"",
+					"-l\"Pods-AWSKinesis\"",
+					"-l\"Pods-AWSMobileAnalytics\"",
+					"-l\"Pods-AWSS3\"",
+					"-l\"Pods-AWSSES\"",
+					"-l\"Pods-AWSSNS\"",
+					"-l\"Pods-AWSSQS\"",
+					"-l\"Pods-AWSSimpleDB\"",
+					"-l\"Pods-catalyze-ios-sdk\"",
+					"-l\"sqlite3\"",
+					"-l\"z\"",
+					"-framework",
+					"\"CoreGraphics\"",
+					"-framework",
+					"\"Foundation\"",
+					"-framework",
+					"\"MobileCoreServices\"",
+					"-framework",
+					"\"Security\"",
+					"-framework",
+					"\"SystemConfiguration\"",
+					"-framework",
+					"\"UIKit\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "io.catalyze.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";

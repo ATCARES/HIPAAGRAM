@@ -1,10 +1,18 @@
-//
-//  MessageTableViewCell.m
-//  HipaaGram
-//
-//  Created by ault on 2/18/15.
-//  Copyright (c) 2015 Catalyze Inc. All rights reserved.
-//
+/*
+ * Copyright (C) 2015 Catalyze, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 
 #import "MessageTableViewCell.h"
 #import <QuartzCore/QuartzCore.h>
@@ -21,7 +29,8 @@
 @implementation MessageTableViewCell
 
 - (void)awakeFromNib {
-    _txtMessage.layer.cornerRadius = 12;
+    _txtMessage.layer.cornerRadius = 5;
+    _txtMessage.textContainerInset = UIEdgeInsetsMake(10, 10, 10, 10);
 }
 
 - (void)initializeWithMessage:(Message *)message sender:(BOOL)sender {
@@ -33,35 +42,28 @@
     _lblTimestamp.text = [format stringFromDate:timestamp];
     
     CGFloat usableWidth = [UIScreen mainScreen].bounds.size.width - 16.0f; // 8 for each side padding
-    CGFloat idealWidth = usableWidth * 0.85; // ideally we want 85% of the screen width for aesthetics
+    CGFloat idealWidth = usableWidth * 0.8; // ideally we want 80% of the screen width for aesthetics
     // sizeThatFits: doesn't work with UITextViews at all
-    //CGSize idealSize = [self labelSizeThatFits:CGSizeMake(idealWidth, MAXFLOAT) withText:[message text]];
     CGFloat bigMargin = usableWidth - idealWidth;//idealSize.width;
     CGFloat padding = 0.0; // the auto layout alignment uses an offset from the default
+    UIColor *green = [UIColor colorWithRed:GREEN_r green:GREEN_g blue:GREEN_b alpha:1.0f];
+    _txtMessage.layer.borderColor = green.CGColor;
+    _txtMessage.layer.borderWidth = 1;
     if (sender) {
         _txtMessage.textAlignment = NSTextAlignmentRight;
         _txtMessage.textColor = [UIColor whiteColor];
-        _txtMessage.backgroundColor = [UIColor colorWithRed:51.0/255.0f green:181.0/255.0f blue:229.0/255.0f alpha:1.0f];
+        _txtMessage.backgroundColor = green;
         _leftConstraint.constant = bigMargin;
         _rightConstraint.constant = padding;
     } else {
         _txtMessage.textAlignment = NSTextAlignmentLeft;
-        _txtMessage.textColor = [UIColor blackColor];
-        _txtMessage.backgroundColor = [UIColor colorWithRed:225.0/255.0f green:225.0/255.0f blue:225.0/255.0f alpha:1.0f];
+        _txtMessage.textColor = green;
+        _txtMessage.backgroundColor = [UIColor whiteColor];
         _leftConstraint.constant = padding;
         _rightConstraint.constant = -1*bigMargin;
     }
     [_txtMessage sizeToFit];
     [self layoutIfNeeded];
 }
-
-//- (CGSize)labelSizeThatFits:(CGSize)size withText:(NSString *)text {
-//    UILabel *lbl = [[UILabel alloc] init];
-//    lbl.numberOfLines = 0;
-//    lbl.font = [UIFont systemFontOfSize:14.0];
-//    lbl.text = text;
-//    [lbl.text sizeWithAttributes:@{}];
-//    return [lbl sizeThatFits:size];
-//}
 
 @end
