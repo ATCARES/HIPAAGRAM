@@ -20,15 +20,18 @@
 #define GREEN_g 210.0/255.0
 #define GREEN_b 145.0/255.0
 
+// sandbox
 #define APP_ID @""
 #define API_KEY @""
 
-// sandbox
 #define ENDPOINT_NAME @"APNS_SANDBOX"
 #define IDENTITY_POOL_ID @""
 #define APPLICATION_ARN @""
 
 // prod
+//#define APP_ID @""
+//#define API_KEY @""
+//
 //#define ENDPOINT_NAME @"APNS"
 //#define IDENTITY_POOL_ID @""
 //#define APPLICATION_ARN @""

@@ -45,6 +45,7 @@
 		278B8D5D19106B9C00CF5ED0 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278B8D5919106B9C00CF5ED0 /* CoreTelephony.framework */; };
 		278B8D5E19106B9C00CF5ED0 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 278B8D5A19106B9C00CF5ED0 /* libsqlite3.dylib */; };
 		278B8D5F19106B9C00CF5ED0 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 278B8D5B19106B9C00CF5ED0 /* libz.dylib */; };
+		279AFBA11B54C4D10070008A /* NSString+Validation.m in Sources */ = {isa = PBXBuildFile; fileRef = 279AFBA01B54C4D10070008A /* NSString+Validation.m */; };
 		27CB6E9719398B78003B212B /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27CB6E9619398B78003B212B /* AdSupport.framework */; };
 		27CB6E9919398B83003B212B /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27CB6E9819398B83003B212B /* iAd.framework */; };
 		D1176ABB6251438CAF19C04F /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DBBF0EE876B48C7A4C93652 /* libPods.a */; };
@@ -114,6 +115,8 @@
 		278B8D5919106B9C00CF5ED0 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
 		278B8D5A19106B9C00CF5ED0 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		278B8D5B19106B9C00CF5ED0 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		279AFB9F1B54C4D10070008A /* NSString+Validation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+Validation.h"; sourceTree = "<group>"; };
+		279AFBA01B54C4D10070008A /* NSString+Validation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Validation.m"; sourceTree = "<group>"; };
 		27CB6E9619398B78003B212B /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 		27CB6E9819398B83003B212B /* iAd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAd.framework; path = System/Library/Frameworks/iAd.framework; sourceTree = SDKROOT; };
 		4DBBF0EE876B48C7A4C93652 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -290,6 +293,8 @@
 			isa = PBXGroup;
 			children = (
 				27709736190EC447006D2E6D /* Constants.h */,
+				279AFB9F1B54C4D10070008A /* NSString+Validation.h */,
+				279AFBA01B54C4D10070008A /* NSString+Validation.m */,
 			);
 			name = Helper;
 			path = HipaaGram/Helper;
@@ -474,6 +479,7 @@
 				2736C3C71A954EAF00BB9879 /* ConversationViewController.m in Sources */,
 				277096AC190EA468006D2E6D /* ContactsViewController.m in Sources */,
 				2770969F190EA2EF006D2E6D /* SignInViewController.m in Sources */,
+				279AFBA11B54C4D10070008A /* NSString+Validation.m in Sources */,
 				27709679190EA2C1006D2E6D /* main.m in Sources */,
 				277096C5190EA7F5006D2E6D /* ContactTableViewCell.m in Sources */,
 			);
@@ -594,7 +600,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Catalyze Inc (8SQK7H5L22)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "HipaaGram/HipaaGram-Prefix.pch";
 				HEADER_SEARCH_PATHS = "$(inherited)";
@@ -636,7 +642,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "io.catalyze.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "bd02257f-47c7-4972-99f2-c277ff7bce32";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
@@ -648,7 +654,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Catalyze Inc (8SQK7H5L22)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "HipaaGram/HipaaGram-Prefix.pch";
 				HEADER_SEARCH_PATHS = "$(inherited)";
@@ -690,7 +696,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "io.catalyze.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "bd02257f-47c7-4972-99f2-c277ff7bce32";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};

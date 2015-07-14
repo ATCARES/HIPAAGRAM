@@ -14,22 +14,15 @@
  *    limitations under the License.
  */
 
-#import <UIKit/UIKit.h>
+#import "NSString+Validation.h"
 
-@protocol SignInDelegate <NSObject>
+@implementation NSString (Validation)
 
-- (void)signInSuccessful;
-
-@end
-
-@interface SignInViewController : UIViewController<UITextFieldDelegate, UIAlertViewDelegate>
-
-@property (strong, nonatomic) id<SignInDelegate> delegate;
-@property (weak, nonatomic) IBOutlet UITextField *txtPhoneNumber;
-@property (weak, nonatomic) IBOutlet UITextField *txtPassword;
-@property (weak, nonatomic) IBOutlet UIButton *btnRegister;
-@property (weak, nonatomic) IBOutlet UIButton *btnSignIn;
-- (IBAction)signIn:(id)sender;
-- (IBAction)registerUser:(id)sender;
+// http://stackoverflow.com/questions/3139619/check-that-an-email-address-is-valid-on-ios
+-(BOOL)isValidEmail {
+    NSString *laxRegex = @"^.+@([A-Za-z0-9-]+\\.)+[A-Za-z]{2}[A-Za-z]*$";
+    NSPredicate *emailTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", laxRegex];
+    return [emailTest evaluateWithObject:self];
+}
 
 @end

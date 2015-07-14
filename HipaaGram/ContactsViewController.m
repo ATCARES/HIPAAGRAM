@@ -18,6 +18,7 @@
 #import "ContactTableViewCell.h"
 #import "AFNetworking.h"
 #import "Catalyze.h"
+#import "MBProgressHUD.h"
 
 @interface ContactsViewController ()
 
@@ -43,6 +44,7 @@
 }
 
 - (void)fetchContacts {
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     CatalyzeQuery *query = [CatalyzeQuery queryWithClassName:@"contacts"];
     [query setPageNumber:1];
     [query setPageSize:100];
@@ -53,8 +55,10 @@
                 [_currentConversations addObject:[[entry content] valueForKey:@"user_username"]];
             }
         }
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
         [_tblContacts reloadData];
     } failure:^(NSDictionary *result, int status, NSError *error) {
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
         [[[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Could not fetch the contacts: %@", error.localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
     }];
 }
@@ -86,9 +90,12 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [[tableView cellForRowAtIndexPath:indexPath] setSelected:NO animated:YES];
     [[tableView cellForRowAtIndexPath:indexPath] setHighlighted:NO animated:YES];
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     [self startConversation:[_contacts objectAtIndex:indexPath.row] success:^(id result) {
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
         [self.navigationController popViewControllerAnimated:YES];
     } failure:^(NSDictionary *result, int status, NSError *error) {
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
         [[[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Could not start conversation: %@", error.localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
     }];
 }

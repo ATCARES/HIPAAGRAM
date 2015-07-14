@@ -50,7 +50,7 @@
     [self.window makeKeyAndVisible];
     
     [Catalyze setApiKey:API_KEY applicationId:APP_ID];
-    [Catalyze setLoggingLevel:kLoggingLevelOff];
+//    [Catalyze setLoggingLevel:kLoggingLevelDebug];
     
     UILocalNotification *note = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
     if (note) {

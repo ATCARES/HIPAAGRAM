@@ -16,8 +16,13 @@
 
 #import "SignInViewController.h"
 #import "Catalyze.h"
+#import "NSString+Validation.h"
+#import "MBProgressHUD.h"
 
 @interface SignInViewController ()
+
+@property CAGradientLayer *signInGradient;
+@property CAGradientLayer *registerGradient;
 
 @end
 
@@ -47,20 +52,26 @@
     
     _btnSignIn.layer.cornerRadius = 5;
     _btnSignIn.layer.masksToBounds = YES;
+    _btnSignIn.backgroundColor = bottomGreen;
     _btnRegister.layer.cornerRadius = 5;
     _btnRegister.layer.masksToBounds = YES;
+    _btnRegister.backgroundColor = bottomBlue;
     
-    CAGradientLayer *signInGradient = [CAGradientLayer layer];
-    signInGradient.colors = @[(id)topGreen.CGColor, (id)bottomGreen.CGColor];
-    signInGradient.frame = _btnSignIn.bounds;
-    signInGradient.cornerRadius = 5;
-    [_btnSignIn.layer insertSublayer:signInGradient atIndex:0];
+    _signInGradient = [CAGradientLayer layer];
+    _signInGradient.colors = @[(id)topGreen.CGColor, (id)bottomGreen.CGColor];
+    _signInGradient.frame = _btnSignIn.bounds;
+    _signInGradient.cornerRadius = 5;
     
-    CAGradientLayer *registerGradient = [CAGradientLayer layer];
-    registerGradient.colors = @[(id)topBlue.CGColor, (id)bottomBlue.CGColor];
-    registerGradient.frame = _btnRegister.bounds;
-    registerGradient.cornerRadius = 5;
-    [_btnRegister.layer insertSublayer:registerGradient atIndex:0];
+    _registerGradient = [CAGradientLayer layer];
+    _registerGradient.colors = @[(id)topBlue.CGColor, (id)bottomBlue.CGColor];
+    _registerGradient.frame = _btnRegister.bounds;
+    _registerGradient.cornerRadius = 5;
+    
+    // gradient button filling is only broken on ipad
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+        [_btnSignIn.layer insertSublayer:_signInGradient atIndex:0];
+        [_btnRegister.layer insertSublayer:_registerGradient atIndex:0];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -68,7 +79,21 @@
     self.navigationController.navigationBarHidden = YES;
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        // gradient button filling is only broken on ipad
+        _signInGradient.frame = _btnSignIn.bounds;
+        _registerGradient.frame = _btnRegister.bounds;
+        
+        [_btnSignIn.layer insertSublayer:_signInGradient atIndex:0];
+        [_btnRegister.layer insertSublayer:_registerGradient atIndex:0];
+    }
+}
+
 - (IBAction)signIn:(id)sender {
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     [self.view endEditing:YES];
     if (_txtPhoneNumber.text.length == 0 || _txtPassword.text.length == 0) {
         return;
@@ -80,6 +105,7 @@
         [[NSUserDefaults standardUserDefaults] synchronize];
         [self addToContacts:[[CatalyzeUser currentUser] username] usersId:[[CatalyzeUser currentUser] usersId]];
     } failure:^(NSDictionary *result, int status, NSError *error) {
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
         [[[UIAlertView alloc] initWithTitle:@"Error" message:@"Invalid username / password" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
     }];
 }
@@ -90,13 +116,22 @@
         [[[UIAlertView alloc] initWithTitle:@"Error" message:@"Please input a valid phone number and password" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
         return;
     }
-    
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Registration" message:@"We need your email address in order to send an activation email for your HIPAAGRAM account" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Send", nil];
+    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [alert textFieldAtIndex:0].keyboardType = UIKeyboardTypeEmailAddress;
+    [alert show];
+}
+
+- (void)finishRegistration:(NSString *)emailString {
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     Email *email = [[Email alloc] init];
-    email.primary = [self randomEmail];
+    email.primary = emailString;
     
     [CatalyzeUser signUpWithUsernameInBackground:_txtPhoneNumber.text email:email name:[[Name alloc] init] password:_txtPassword.text success:^(CatalyzeUser *result) {
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
         [[[UIAlertView alloc] initWithTitle:@"Success" message:@"Please activate your account and then sign in" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
     } failure:^(NSDictionary *result, int status, NSError *error) {
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
         [[[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Could not sign up: %@", error.localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
     }];
 }
@@ -114,30 +149,22 @@
             [[contact content] setValue:usersId forKey:@"user_usersId"];
             [[contact content] setValue:[[NSUserDefaults standardUserDefaults] valueForKey:kEndpointArn] forKey:kUserDeviceToken];
             [contact createInBackgroundWithSuccess:^(id result) {
+                [MBProgressHUD hideHUDForView:self.view animated:YES];
                 [_delegate signInSuccessful];
             } failure:^(NSDictionary *result, int status, NSError *error) {
                 NSLog(@"Was not added to the contacts custom class! This will get resolved upon next sign in. %@ %@", result, error);
+                [MBProgressHUD hideHUDForView:self.view animated:YES];
                 [_delegate signInSuccessful];
             }];
         } else {
+            [MBProgressHUD hideHUDForView:self.view animated:YES];
             [_delegate signInSuccessful];
         }
     } failure:^(NSDictionary *result, int status, NSError *error) {
         NSLog(@"Could not determine if we are in the Contacts list, will resolve upon next sign in. %@ %@", result, error);
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
         [_delegate signInSuccessful];
     }];
-}
-
-// from http://stackoverflow.com/questions/2633801/generate-a-random-alphanumeric-string-in-cocoa
-- (NSString *)randomEmail {
-    NSString *letters = @"abcdefghijklmnopqrstuvwxyz0123456789";
-    NSMutableString *randomString = [NSMutableString stringWithCapacity:10];
-    
-    for (int i=0; i<10; i++) {
-        [randomString appendFormat: @"%C", [letters characterAtIndex: arc4random() % [letters length]]];
-    }
-    
-    return [NSString stringWithFormat:@"josh+%@@catalyze.io", randomString];
 }
 
 #pragma mark - UITextFieldDelegate
@@ -148,6 +175,20 @@
         [_txtPassword becomeFirstResponder];
     }
     return YES;
+}
+
+#pragma mark - UIAlertViewDelegate
+
+- (void)alertView:(nonnull UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if (buttonIndex == 1) {
+        [alertView dismissWithClickedButtonIndex:0 animated:YES];
+        NSString *email = [alertView textFieldAtIndex:0].text;
+        if ([email isValidEmail]) {
+            [self finishRegistration:email];
+        } else {
+            [[[UIAlertView alloc] initWithTitle:@"Oops!" message:@"It looks like that email wasn't formatted correctly, let's try that again" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
+        }
+    }
 }
 
 @end

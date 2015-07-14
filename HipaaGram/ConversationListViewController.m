@@ -23,6 +23,7 @@
 #import "Catalyze.h"
 #import "AWSCore.h"
 #import "AWSSNS.h"
+#import "MBProgressHUD.h"
 
 @interface ConversationListViewController ()
 
@@ -175,7 +176,7 @@
 
 #pragma mark - UIAlertViewDelegate
 
-- (void)alertView:(nonnull UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     if (buttonIndex == 1) {
         [alertView dismissWithClickedButtonIndex:0 animated:YES];
         NSString *username = [alertView textFieldAtIndex:0].text;
@@ -184,6 +185,7 @@
                 [[[UIAlertView alloc] initWithTitle:@"Oops!" message:[NSString stringWithFormat:@"A conversation with %@ has already been started. Tap on their name to start chatting", username] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
                 return;
             }
+            [MBProgressHUD showHUDAddedTo:self.view animated:YES];
             CatalyzeQuery *query = [CatalyzeQuery queryWithClassName:@"contacts"];
             query.queryField = kUserUsername;
             query.queryValue = username;
@@ -191,16 +193,20 @@
             query.pageSize = 1;
             [query retrieveAllEntriesInBackgroundWithSuccess:^(NSArray *result) {
                 if (result.count == 0) {
+                    [MBProgressHUD hideHUDForView:self.view animated:YES];
                     [[[UIAlertView alloc] initWithTitle:@"Uh-oh" message:[NSString stringWithFormat:@"A user with username %@ does not exist. Let's try that again", username] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
                 } else {
                     // start the conversation
                     [self startConversation:[result objectAtIndex:0] success:^(id result) {
+                        [MBProgressHUD hideHUDForView:self.view animated:YES];
                         [self fetchConversationList];
                     } failure:^(NSDictionary *result, int status, NSError *error) {
+                        [MBProgressHUD hideHUDForView:self.view animated:YES];
                         [[[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Could not start conversation: %@", error.localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
                     }];
                 }
             } failure:^(NSDictionary *result, int status, NSError *error) {
+                [MBProgressHUD hideHUDForView:self.view animated:YES];
                 [[[UIAlertView alloc] initWithTitle:@"Error" message:@"Could not check if that user exists, please try again" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil] show];
             }];
         }

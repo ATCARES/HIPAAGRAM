@@ -1,22 +1,22 @@
-HIPAAgram
+HIPAAGRAM
 =========
 HIPAA compliant WhatsApp
 
 Prerequisites
 -------------
-HIPAAgram uses cocoapods to manage the libraries it needs. You will need cocoapods installed to use this app. Check out their [docs](http://cocoapods.org/) or simply run `sudo gem install cocoapods` in a terminal window.
+HIPAAGRAM uses cocoapods to manage the libraries it needs. You will need cocoapods installed to use this app. Check out their [docs](http://cocoapods.org/) or simply run `sudo gem install cocoapods` in a terminal window.
 
 Getting Started
 ---------------
-HIPAAgram is an example app written to show the capabilities of the Catalyze HIPAA compliant APIs. An explanation of the following instructions can be found in both the [API Guide](https://docs.catalyze.io/guides/api/latest/) and the [blog post](https://blog.catalyze.io) explaining HIPAAgram. In order to run this application you will have to follow these steps
+HIPAAGRAM is an example app written to show the capabilities of the Catalyze HIPAA compliant APIs. An explanation of the following instructions can be found in both the [API Guide](https://docs.catalyze.io/guides/api/latest/) and the [blog post](https://blog.catalyze.io) explaining HIPAAGRAM. In order to run this application you will have to follow these steps
 
 * Head over to the [dashboard](https://dashboard.catalyze.io) and sign up for an account
 * Create an Organization
-* Create an Application to run this app (call it HIPAAgram!)
+* Create an Application to run this app (call it HIPAAGRAM!)
 * Create an API Key
-* Insert the full 3 part API Key (<type> <identifier> <id>) in the `application:didFinishLaunchingWithOptions:` method in the AppDelegate.m file
-* Insert the application ID from the dashboard in the `application:didFinishLaunchingWithOptions:` method in the AppDelegate.m file
-* In `SignInViewController.m` you need to change the hardcoded email to an email address you can access. Change this line `return [NSString stringWithFormat:@"josh+%@@catalyze.io", randomString];` to be something such as `return [NSString stringWithFormat:@"me+%@@mydomain.com", randomString];`. Notice the `me` and `mydomain.com`.
+* Insert the API Key (<id>) in the `Constants.h` file
+* Insert the application ID from the dashboard in the `Constants.h` file
+* If you want to use Amazon SNS for push notifications, follow their documentation and enter the appropriate values in the `Constants.h` file
 
 Now that we have our org and app setup, we need to create a few custom classes and assign appropriate permissions. There are two ways to accomplish this, run a script or do it manually with cURL commands.
 
@@ -53,7 +53,9 @@ Create a custom class named `conversations` with the following schema. Be sure t
 	"sender":"string",
 	"recipient":"string",
 	"sender_id":"string",
-	"recipient_id":"string"
+	"recipient_id":"string",
+	"sender_deviceToken": "string",
+	"recipient_deviceToken": "string"
 },
 "phi":true
 }
@@ -65,6 +67,7 @@ Create a custom class named `contacts` with the following schema. Be sure to mar
 {
 "name":"contacts",
 "schema":{
+	"user_deviceToken": "string",
 	"user_username":"string",
 	"user_usersId":"string"
 },
@@ -118,16 +121,16 @@ pod install
 
 in the root of the project from a terminal window to install all the necessary dependencies. Open up `HipaaGram.xcworkspace` (do not open `HipaaGram.xcodeproj`) and you're all set to go!
 
-Urban Airship
--------------
-HIPAAgram uses push notifications to alert recipients that they have a new message. No details about the message are sent in the notification. This is so the app remains HIPAA compliant. The notification is simply an alert to tell the recipient that they should query for new messages. In order to use this feature you will need to sign up for a trial account on [Urban Airship](http://urbanairship.com/). You will then need to fill in the appropriate keys in the `AirshipConfig.plist` file in the root of the project.
+Amazon SNS
+----------
+HIPAAgram uses push notifications to alert recipients that they have a new message. No details about the message are sent in the notification. This is so the app remains HIPAA compliant. The notification is simply an alert to tell the recipient that they should query for new messages. In order to use this feature you will need to sign up for an AWS account and setup Amazon SNS or replace it with your own push notification provider. You will then need to fill in the appropriate keys in the `Constants.h` file.
 
-If you do not wish to use this feature, simply comment out the related Urban Airship lines in the `AppDelegate.m` file. 
+If you do not wish to use this feature, simply don't fill in any SNS values in the `Constants.h` file. You may see errors in the logs, but it will not degrade the UI of the application.
 
 License
 --------
 
-    Copyright 2014 Catalyze, Inc.
+    Copyright 2015 Catalyze, Inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

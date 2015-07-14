@@ -7,6 +7,43 @@ import ssl
 import sys
 import getopt
 
+CONTACTS_CC_SCHEMA = {
+	'name': 'contacts',
+	'schema': {
+		'user_deviceToken': 'string',
+		'user_username': 'string',
+		'user_usersId': 'string'
+	},
+	'phi': False
+}
+
+CONVERSATIONS_CC_SCHEMA = {
+	'name': 'conversations',
+	'schema': {
+		'sender': 'string',
+		'recipient': 'string',
+		'sender_id': 'string',
+		'recipient_id': 'string',
+		'sender_deviceToken': 'string',
+		'recipient_deviceToken': 'string'
+	},
+	'phi': True
+}
+
+MESSAGES_CC_SCHEMA = {
+	'name': 'messages',
+	'schema': {
+		'conversationsId': 'string',
+		'msgContent': 'string',
+		'toPhone': 'string',
+		'fromPhone': 'string',
+		'timestamp': 'string',
+		'isPhi': 'boolean',
+		'fileId': 'string'
+	},
+	'phi': True
+}
+
 class MyAdapter(HTTPAdapter):
     def init_poolmanager(self, connections, maxsize, block=False):
         self.poolmanager = PoolManager(num_pools=connections,
@@ -47,7 +84,7 @@ if not username or not password or not app_id or not api_key:
 	usage()
 	sys.exit(2)
 
-# Script to setup an org, app, and custom classes for HipaaGram
+# Script to setup an app, and custom classes for HipaaGram
 
 base_url = "https://api.catalyze.io"
 
@@ -67,22 +104,19 @@ headers['Authorization'] = 'Bearer {}'.format(resp['sessionToken'])
 
 # create the contacts custom class
 route = '{}/v2/classes'.format(base_url)
-data = {'name':'contacts','schema':{'user_username':'string','user_usersId':'string'},'phi':False}
-r = s.post(route, data=json.dumps(data), headers=headers)
+r = s.post(route, data=json.dumps(CONTACTS_CC_SCHEMA), headers=headers)
 resp = r.json()
 r.raise_for_status()
 
 # create the conversations custom class
 route = '{}/v2/classes'.format(base_url)
-data = {'name':'conversations','schema':{'sender':'string','recipient':'string','sender_id':'string','recipient_id':'string'},'phi':True}
-r = s.post(route, data=json.dumps(data), headers=headers)
+r = s.post(route, data=json.dumps(CONVERSATIONS_CC_SCHEMA), headers=headers)
 resp = r.json()
 r.raise_for_status()
 
 # create the messages custom class
 route = '{}/v2/classes'.format(base_url)
-data = {'name':'messages','schema':{'conversationsId':'string','msgContent':'string','toPhone':'string','fromPhone':'string','timestamp':'string','isPhi':'boolean','fileId':'string'},'phi':True}
-r = s.post(route, data=json.dumps(data), headers=headers)
+r = s.post(route, data=json.dumps(MESSAGES_CC_SCHEMA), headers=headers)
 resp = r.json()
 r.raise_for_status()
 
