@@ -20,8 +20,9 @@
 @interface ConversationListViewController : HipaaGramViewController<UITableViewDataSource, UITableViewDelegate, UIAlertViewDelegate>
 
 @property (strong, nonatomic) NSMutableArray *conversations;
-@property BOOL updateDeviceToken;
 
 @property (weak, nonatomic) IBOutlet UITableView *tblConversationList;
+
+- (void)updateDeviceToken;
 
 @end

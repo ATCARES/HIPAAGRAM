@@ -50,7 +50,7 @@
     [self.window makeKeyAndVisible];
     
     [Catalyze setApiKey:API_KEY applicationId:APP_ID];
-//    [Catalyze setLoggingLevel:kLoggingLevelDebug];
+    [Catalyze setLoggingLevel:kLoggingLevelDebug];
     
     UILocalNotification *note = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
     if (note) {
@@ -98,19 +98,16 @@
     AWSSNS *sns = [AWSSNS defaultSNS];
     AWSSNSCreatePlatformEndpointInput *request = [AWSSNSCreatePlatformEndpointInput new];
     request.token = deviceTokenString;
+    request.attributes = @{@"Enabled": @"true"};
     request.platformApplicationArn = APPLICATION_ARN;
     [[sns createPlatformEndpoint:request] continueWithBlock:^id(AWSTask *task) {
         if (task.error) {
             NSLog(@"Error: %@",task.error);
         } else {
             AWSSNSCreateEndpointResponse *createEndPointResponse = task.result;
-            NSString *oldEndpointArn = [[NSUserDefaults standardUserDefaults] valueForKey:kEndpointArn];
             [[NSUserDefaults standardUserDefaults] setObject:createEndPointResponse.endpointArn forKey:kEndpointArn];
             [[NSUserDefaults standardUserDefaults] synchronize];
-            if (![createEndPointResponse.endpointArn isEqualToString:oldEndpointArn]) {
-                // we must go update our endpoint ARN in all conversations and our contacts class.
-                _conversationListViewController.updateDeviceToken = YES;
-            }
+            [_conversationListViewController updateDeviceToken];
         }
         return nil;
     }];

@@ -27,6 +27,9 @@
 
 @interface ConversationListViewController ()
 
+@property BOOL fetchOwn;
+@property BOOL fetchAuthor;
+
 @end
 
 @implementation ConversationListViewController
@@ -38,7 +41,8 @@
     NSString *modifier = totalUnread > 0 ? [NSString stringWithFormat:@" (%ld)", totalUnread] : @"";
     self.navigationItem.title = [NSString stringWithFormat:@"Conversations%@", modifier];
     
-    _updateDeviceToken = NO;
+    _fetchOwn = NO;
+    _fetchAuthor = YES;
     
     UIBarButtonItem *left = [[UIBarButtonItem alloc] initWithTitle:@"Sign Out" style:UIBarButtonItemStylePlain target:self action:@selector(logout)];
     [left setTitleTextAttributes:@{NSFontAttributeName: [UIFont fontWithName:@"AvenirNext-Medium" size:18.0]} forState:UIControlStateNormal];
@@ -63,6 +67,15 @@
     [self fetchConversationList];
 }
 
+- (void)updateDeviceToken {
+    NSString *deviceToken = [[NSUserDefaults standardUserDefaults] valueForKey:kEndpointArn];
+    if (_fetchOwn && _fetchAuthor && deviceToken) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            [(AppDelegate *)[UIApplication sharedApplication].delegate updateConversations:_conversations withDeviceToken:[[NSUserDefaults standardUserDefaults] valueForKey:kEndpointArn]];
+        });
+    }
+}
+
 - (void)fetchConversationList {
     _conversations = [NSMutableArray array];
     CatalyzeQuery *query = [CatalyzeQuery queryWithClassName:@"conversations"];
@@ -71,6 +84,8 @@
     [query retrieveInBackgroundWithSuccess:^(NSArray *result) {
         [_conversations addObjectsFromArray:result];
         [_tblConversationList reloadData];
+        _fetchOwn = YES;
+        [self updateDeviceToken];
     } failure:^(NSDictionary *result, int status, NSError *error) {
         NSLog(@"Could not fetch the list of conversations you own: %@", error.localizedDescription);
     }];
@@ -82,12 +97,8 @@
     [queryAuthor retrieveInBackgroundWithSuccess:^(NSArray *result) {
         [_conversations addObjectsFromArray:result];
         [_tblConversationList reloadData];
-        if (_updateDeviceToken) {
-            _updateDeviceToken = NO;
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                [(AppDelegate *)[UIApplication sharedApplication].delegate updateConversations:_conversations withDeviceToken:[[NSUserDefaults standardUserDefaults] valueForKey:kEndpointArn]];
-            });
-        }
+        _fetchAuthor = YES;
+        [self updateDeviceToken];
     } failure:^(NSDictionary *result, int status, NSError *error) {
         NSLog(@"Could not fetch the list of conversations you author: %@", error.localizedDescription);
     }];
