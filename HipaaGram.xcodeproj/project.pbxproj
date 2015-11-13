@@ -322,6 +322,7 @@
 				27709667190EA2C1006D2E6D /* Resources */,
 				108F089631664571972A7925 /* Copy Pods Resources */,
 				27709734190EB607006D2E6D /* TODO as Warnings */,
+				16160870AE651CBBCF095FC4 /* Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -431,6 +432,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		16160870AE651CBBCF095FC4 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		27709734190EB607006D2E6D /* TODO as Warnings */ = {
@@ -609,22 +625,6 @@
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
-					"-l\"Pods-AFNetworkActivityLogger\"",
-					"-l\"Pods-AFNetworking\"",
-					"-l\"Pods-AWSAutoScaling\"",
-					"-l\"Pods-AWSCloudWatch\"",
-					"-l\"Pods-AWSCore\"",
-					"-l\"Pods-AWSDynamoDB\"",
-					"-l\"Pods-AWSEC2\"",
-					"-l\"Pods-AWSElasticLoadBalancing\"",
-					"-l\"Pods-AWSKinesis\"",
-					"-l\"Pods-AWSMobileAnalytics\"",
-					"-l\"Pods-AWSS3\"",
-					"-l\"Pods-AWSSES\"",
-					"-l\"Pods-AWSSNS\"",
-					"-l\"Pods-AWSSQS\"",
-					"-l\"Pods-AWSSimpleDB\"",
-					"-l\"Pods-catalyze-ios-sdk\"",
 					"-l\"sqlite3\"",
 					"-l\"z\"",
 					"-framework",
@@ -663,22 +663,6 @@
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
-					"-l\"Pods-AFNetworkActivityLogger\"",
-					"-l\"Pods-AFNetworking\"",
-					"-l\"Pods-AWSAutoScaling\"",
-					"-l\"Pods-AWSCloudWatch\"",
-					"-l\"Pods-AWSCore\"",
-					"-l\"Pods-AWSDynamoDB\"",
-					"-l\"Pods-AWSEC2\"",
-					"-l\"Pods-AWSElasticLoadBalancing\"",
-					"-l\"Pods-AWSKinesis\"",
-					"-l\"Pods-AWSMobileAnalytics\"",
-					"-l\"Pods-AWSS3\"",
-					"-l\"Pods-AWSSES\"",
-					"-l\"Pods-AWSSNS\"",
-					"-l\"Pods-AWSSQS\"",
-					"-l\"Pods-AWSSimpleDB\"",
-					"-l\"Pods-catalyze-ios-sdk\"",
 					"-l\"sqlite3\"",
 					"-l\"z\"",
 					"-framework",
