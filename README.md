@@ -56,8 +56,7 @@ Create a custom class named `conversations` with the following schema. Be sure t
 	"recipient_id":"string",
 	"sender_deviceToken": "string",
 	"recipient_deviceToken": "string"
-},
-"phi":true
+	}
 }
 ```
 
@@ -70,8 +69,7 @@ Create a custom class named `contacts` with the following schema. Be sure to mar
 	"user_deviceToken": "string",
 	"user_username":"string",
 	"user_usersId":"string"
-},
-"phi":false
+	}
 }
 ```
 
@@ -88,8 +86,7 @@ Lastly, create a custom class named `messages` with the following schema. Be sur
 	"timestamp":"string",
 	"isPhi":"boolean",
 	"fileId":"string"
-},
-"phi":true
+	}
 }
 ```
 
